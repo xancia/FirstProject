@@ -3,7 +3,6 @@ body {
   padding: 0;
   background: url("assets/background/city.png") no-repeat center center fixed;
   background-size: cover;
-  font-family: "Press Start 2P", cursive;
 }
 
 .game-area {
@@ -15,7 +14,7 @@ body {
   height: 100vh;
 }
 
-Canvas {
+canvas {
   width: 320px;
   height: 480px;
   background: #000;
