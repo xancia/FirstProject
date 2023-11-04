@@ -90,6 +90,22 @@ const animate = () => {
       characterMoving.drawCharacterMoving();
     }
 
+    if (keys.a.pressed) {
+        characterMoving.position.x = characterMoving.position.x - 1
+    }
+
+    if (keys.d.pressed) {
+        characterMoving.position.x = characterMoving.position.x + 1
+    }
+
+    if (keys.w.pressed) {
+        characterMoving.position.y = characterMoving.position.y - 1
+    }
+
+    if (keys.s.pressed) {
+        characterMoving.position.y = characterMoving.position.y + 1
+    }
+
 }
 
 
