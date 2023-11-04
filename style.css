@@ -15,13 +15,13 @@ body {
 }
 
 canvas {
-  width: 320px;
+  width: 304px;
   height: 480px;
   background: #000;
 }
 
 .instructions {
-  width: 300px;
+  width: 284px;
   display: flex;
   justify-content: center;
   align-items: center;
