@@ -1,9 +1,9 @@
 body {
-    margin: 0;
-    padding: 0;
-    background: url('assets/background/city.png') no-repeat center center fixed;
-    background-size: cover;
-    font-family: 'Press Start 2P', cursive; 
+  margin: 0;
+  padding: 0;
+  background: url("assets/background/city.png") no-repeat center center fixed;
+  background-size: cover;
+  font-family: "Press Start 2P", cursive;
 }
 
 .game-area {
@@ -16,27 +16,70 @@ body {
 }
 
 Canvas {
-    width: 320px;
-    height: 480px;
-    border: 1px solid black;
-    display: block;
-    background: #000;
+  width: 320px;
+  height: 480px;
+  background: #000;
 }
 
 .instructions {
-    border: 1px solid black;
-    width: 320px;
-    height: 200px;
-    background: #fff; 
-    color: #000; 
-    padding: 1em;
-    box-sizing: border-box; 
-    text-align: center; 
+  width: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 10px;
+  font-family: "Press Start 2P", cursive;
+  color: white;
+}
+
+.control-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.directions,
+.shoot {
+  display: flex;
+  align-items: center;
+}
+
+.arrow {
+  width: 0;
+  height: 0;
+  margin: 5px;
+  border-style: solid;
+}
+
+.left {
+  border-width: 15px 20px 15px 0;
+  border-color: transparent #ffffff transparent transparent;
+}
+
+.right {
+  border-width: 15px 0 15px 20px;
+  border-color: transparent transparent transparent #ffffff;
+}
+
+.button {
+  width: 40px;
+  height: 20px;
+  background-color: #ffffff;
+  margin: 5px;
+  border: 2px solid #000;
+  box-shadow: 0 4px #666;
+}
+
+.instructions p {
+  font-size: 14px;
+  margin-top: 15px;
 }
 
 @media (max-width: 340px) {
   Canvas {
     width: 300px;
-    height: 450px; 
+    height: 450px;
   }
 }
