@@ -3,6 +3,43 @@ const ctr = canvas.getContext("2d");
 canvas.width = 304;
 canvas.height = 480;
 
+const collisionsMap = [];
+for (let i = 0; i < collisions.length; i += 19) {
+  collisionsMap.push(collisions.slice(i, i + 19));
+} // 19 because there are 19 tiles for the width in tiles, which represent 1 row
+
+class Boundary {
+  static width = 16;
+  static height = 16;
+  constructor({ position }) {
+    this.position = position;
+    this.width = 16;
+    this.height = 16;
+  } // height and width is set to 16 because the map assets is 16x16 tileset
+
+  draw() {
+    ctr.fillStyle = "rgba(255, 255, 255, 0.5)";
+    ctr.fillRect(this.position.x, this.position.y, this.width, this.height);
+  }
+}
+
+// This is checking my collissionMap array stored in collisions.js, the data is used via tiled to get the accurate position for where to draw the collisions. It will only draw where there is a 257 which is where the collision object is.
+const boundaries = [];
+collisionsMap.forEach((row, i) => {
+  row.forEach((collumn, j) => {
+    if (collumn == 257) {
+      boundaries.push(
+        new Boundary({
+          position: {
+            x: j * Boundary.width,
+            y: i * Boundary.height,
+          },
+        })
+      );
+    }
+  });
+});
+
 const image = new Image();
 image.src = "./assets/Tile Set/zombieGameMap.png";
 
@@ -10,7 +47,7 @@ const playerImageWalking = new Image();
 playerImageWalking.src = "./assets/Apocalypse Character Pack/Player/Walk.png";
 
 class Sprite {
-  constructor({ position, image, spriteCuts}) {
+  constructor({ position, image, spriteCuts }) {
     this.position = position;
     this.image = image;
     this.spriteCuts = spriteCuts;
@@ -22,18 +59,18 @@ class Sprite {
 
   drawCharacterMoving() {
     ctr.drawImage(
-        this.image,
-        this.spriteCuts.sx,
-        this.spriteCuts.sy,
-        this.spriteCuts.sw,
-        this.spriteCuts.sh,
-        this.position.x,
-        this.position.y,
-        this.spriteCuts.dw,
-        this.spriteCuts.dh,
-    )
+      this.image,
+      this.spriteCuts.sx,
+      this.spriteCuts.sy,
+      this.spriteCuts.sw,
+      this.spriteCuts.sh,
+      this.position.x,
+      this.position.y,
+      this.spriteCuts.dw,
+      this.spriteCuts.dh
+    );
   }
-}
+} // this class is used to store the methods for drawing images
 
 const background = new Sprite({
   position: {
@@ -42,7 +79,6 @@ const background = new Sprite({
   },
   image: image,
 });
-
 
 const keys = {
   w: {
@@ -62,92 +98,149 @@ const keys = {
 let characterMoving;
 
 playerImageWalking.onload = () => {
-    characterMoving = new Sprite({
-        position: {
-            x: 136,
-            y: 400
-        },
-        spriteCuts: {
-            sx: 0,
-            sy: 0,
-            sw: playerImageWalking.width / 5,
-            sh: playerImageWalking.height / 4,
-            dw: playerImageWalking.width / 5,
-            dh: playerImageWalking.height / 4
-        },
-        image: playerImageWalking
-    });
-  
-    animate(); 
+  characterMoving = new Sprite({
+    position: {
+      x: 136,
+      y: 400,
+    },
+    spriteCuts: {
+      sx: 0,
+      sy: 0,
+      sw: playerImageWalking.width / 5,
+      sh: playerImageWalking.height / 4,
+      dw: playerImageWalking.width / 5,
+      dh: playerImageWalking.height / 4,
+    },
+    image: playerImageWalking,
+  });
+
+  animate();
+};
+
+const rectangularCollision = function ({ rectangle1, rectangle2 }) {
+  return (
+    rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
+    rectangle1.position.x <= rectangle2.position.x + rectangle2.width &&
+    rectangle1.position.y <= rectangle2.position.y + rectangle2.height &&
+    rectangle1.position.y + rectangle1.height >= rectangle2.position.y
+  );
+};
+
+const COLLISION_PADDING = {
+  top: 5,
+  bottom: 0,
+  left: 10,
+  right: 10,
+}; // This is to add padding since the collision was happening too soon compared to character sprite
+
+const movePlayer = (dx, dy) => {
+  const nextPos = {
+    position: {
+      x: characterMoving.position.x + dx + COLLISION_PADDING.left,
+      y: characterMoving.position.y + dy + COLLISION_PADDING.top,
+    },
+    width:
+      characterMoving.spriteCuts.sw -
+      COLLISION_PADDING.left -
+      COLLISION_PADDING.right,
+    height:
+      characterMoving.spriteCuts.sh -
+      COLLISION_PADDING.top -
+      COLLISION_PADDING.bottom,
+  }; // this object is used to check if the next position will be colliding or not, if it does, it rejects the input so that the player doesn't actually collide
+
+  for (let i = 0; i < boundaries.length; i++) {
+    const boundary = boundaries[i];
+    if (
+      rectangularCollision({
+        rectangle1: nextPos,
+        rectangle2: boundary,
+      })
+    ) {
+      return false; // This for loop checks via the rectangularCollision function to see if the player and the boundary are overlapping
+    }
+  }
+
+  characterMoving.position.x += dx;
+  characterMoving.position.y += dy;
+  return true; // the return true/false here might get used later for a condition on the movePlayer function
 };
 
 const animate = () => {
-    window.requestAnimationFrame(animate);
-    ctr.clearRect(0, 0, canvas.width, canvas.height); 
-    background.drawBackground();
-  
-    if (characterMoving) { 
-      characterMoving.drawCharacterMoving();
-    }
+  window.requestAnimationFrame(animate);
+  ctr.clearRect(0, 0, canvas.width, canvas.height);
+  background.drawBackground();
 
-    if (keys.a.pressed && lastKey === 'a') {
-        characterMoving.position.x -=  1
-    }
-    else if (keys.d.pressed && lastKey === 'd') {
-        characterMoving.position.x +=  1
-    }
+  if (characterMoving) {
+    characterMoving.drawCharacterMoving();
+  }
 
-    else if (keys.w.pressed && lastKey === 'w') {
-        characterMoving.position.y -=  1
-    }
+  let player = {
+    position: characterMoving.position,
+    width: characterMoving.spriteCuts.sw,
+    height: characterMoving.spriteCuts.sh,
+  };
 
-    else if (keys.s.pressed && lastKey === 's') {
-        characterMoving.position.y +=  1
-    }
+  boundaries.forEach((boundary) => {
+    boundary.draw();
+  });
 
-}
+  // These call the moveplayer function
+  if (keys.a.pressed && lastKey === "a") {
+    movePlayer(-1, 0);
+  }
+  if (keys.d.pressed && lastKey === "d") {
+    movePlayer(1, 0);
+  }
+  if (keys.w.pressed && lastKey === "w") {
+    movePlayer(0, -1);
+  }
+  if (keys.s.pressed && lastKey === "s") {
+    movePlayer(0, 1);
+  }
+};
 
-let lastKey = ''
+let lastKey = "";
 window.addEventListener("keydown", (evt) => {
   switch (evt.key) {
     case "w":
       keys.w.pressed = true;
-      lastKey = 'w'
+      lastKey = "w";
       break;
 
     case "a":
       keys.a.pressed = true;
-      lastKey = 'a'
+      lastKey = "a";
       break;
 
     case "s":
       keys.s.pressed = true;
-      lastKey = 's'
+      lastKey = "s";
       break;
 
     case "d":
       keys.d.pressed = true;
-      lastKey = 'd'
+      lastKey = "d";
       break;
   }
 });
 
 window.addEventListener("keyup", (evt) => {
-    switch (evt.key) {
-      case "w":
-        keys.w.pressed = false;
-        break;
-  
-      case "a":
-        keys.a.pressed = false;
-        break;
-  
-      case "s":
-        keys.s.pressed = false;
-        break;
-  
-      case "d":
-        keys.d.pressed = false;
-        break;
-    }
-  });
+  switch (evt.key) {
+    case "w":
+      keys.w.pressed = false;
+      break;
+
+    case "a":
+      keys.a.pressed = false;
+      break;
+
+    case "s":
+      keys.s.pressed = false;
+      break;
+
+    case "d":
+      keys.d.pressed = false;
+      break;
+  }
+});
