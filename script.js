@@ -3,11 +3,13 @@ const ctx = canvas.getContext("2d");
 canvas.width = 304;
 canvas.height = 480;
 
+// 19 because there are 19 tiles for the width in tiles, which represent 1 row. Each row is pushed into the collision map as a single array for organization
 const collisionsMap = [];
 for (let i = 0; i < collisions.length; i += 19) {
   collisionsMap.push(collisions.slice(i, i + 19));
-} // 19 because there are 19 tiles for the width in tiles, which represent 1 row. Each row is pushed into the collision map as a single array for organization
+}
 
+// height and width is set to 16 because the map assets is 16x16 tileset
 class Boundary {
   static width = 16;
   static height = 16;
@@ -15,7 +17,7 @@ class Boundary {
     this.position = position;
     this.width = 16;
     this.height = 16;
-  } // height and width is set to 16 because the map assets is 16x16 tileset
+  }
 
   draw() {
     ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
@@ -23,7 +25,7 @@ class Boundary {
   }
 }
 
-// This is checking my collissionMap array stored in collisions.js, the data is used via tiled to get the accurate position for where to draw the collisions. It will only draw where there is a 257 which is where the collision object is.
+// This is checking my collissionMap array stored in collisions.js, the data is used via tiled to get the accurate position for where to draw the collisions and store it in an object in this array. It will only draw where there is a 257 which is where the collision object is.
 const boundaries = [];
 collisionsMap.forEach((row, i) => {
   row.forEach((collumn, j) => {
@@ -39,13 +41,14 @@ collisionsMap.forEach((row, i) => {
     }
   });
 });
-
+console.log(boundaries);
 const image = new Image();
 image.src = "./assets/Tile Set/zombieGameMap.png";
 
 const playerImageWalking = new Image();
 playerImageWalking.src = "./assets/Apocalypse Character Pack/Player/Walk.png";
 
+// this class is used to store the methods for drawing images
 class Sprite {
   constructor({ position, image, spriteCuts }) {
     this.position = position;
@@ -72,8 +75,9 @@ class Sprite {
     );
 
     if (this.moving) {
+    
       // this is to slow down the animation
-
+      
       this.spriteCuts.elapsed++;
 
       if (this.spriteCuts.elapsed % 25 === 0) {
@@ -85,7 +89,7 @@ class Sprite {
       }
     }
   }
-} // this class is used to store the methods for drawing images
+}
 
 const background = new Sprite({
   position: {
@@ -112,7 +116,8 @@ const keys = {
 
 let characterMoving;
 
-playerImageWalking.onload = () => { // only run this function to create the character for drawing if the sprite is loaded
+// only run this function to create the character for drawing if the sprite is loaded
+playerImageWalking.onload = () => {
   characterMoving = new Sprite({
     position: {
       x: 136,
@@ -142,16 +147,20 @@ const rectangularCollision = function ({ rectangle1, rectangle2 }) {
   );
 };
 
+// This is to add padding since the collision was happening too soon compared to character sprite
 const COLLISION_PADDING = {
   top: 5,
   bottom: 0,
   left: 10,
   right: 10,
-}; // This is to add padding since the collision was happening too soon compared to character sprite
+};
 
-const movePlayer = (dx, dy) => { // This function is based the movement amount from animate function
-  characterMoving.moving = true; 
-  const nextPos = { // This calculates the next position before the character actually moves
+// This function is based the movement amount from animate function
+const movePlayer = (dx, dy) => {
+  characterMoving.moving = true;
+  // This calculates the next position before the character actually moves
+  // this object is used to check if the next position will be colliding or not, if it does
+  const nextPos = {
     position: {
       x: characterMoving.position.x + dx + COLLISION_PADDING.left,
       y: characterMoving.position.y + dy + COLLISION_PADDING.top,
@@ -164,8 +173,9 @@ const movePlayer = (dx, dy) => { // This function is based the movement amount f
       characterMoving.spriteCuts.sh -
       COLLISION_PADDING.top -
       COLLISION_PADDING.bottom,
-  }; // this object is used to check if the next position will be colliding or not, if it does, it rejects the input so that the player doesn't actually collide
+  };
 
+  // This for loop checks via the rectangularCollision function using nextpos to see if the player and the boundary are overlapping, if it does, it will return and exit the function before movement happens
   for (let i = 0; i < boundaries.length; i++) {
     const boundary = boundaries[i];
     if (
@@ -174,21 +184,24 @@ const movePlayer = (dx, dy) => { // This function is based the movement amount f
         rectangle2: boundary,
       })
     ) {
-      return false; // This for loop checks via the rectangularCollision function using nextpos to see if the player and the boundary are overlapping, if it does, it will return and exit the function before movement happens
+      return false;
     }
   }
 
+  // the return true/false here might get used later for a condition on the movePlayer function
   characterMoving.position.x += dx;
   characterMoving.position.y += dy;
-  return true; // the return true/false here might get used later for a condition on the movePlayer function
+  return true;
 };
 
 const animate = () => {
   window.requestAnimationFrame(animate);
-  ctx.clearRect(0, 0, canvas.width, canvas.height); // clears the canvas before drawing to avoid potential issues
+  // clears the canvas before drawing to avoid potential issues
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   background.drawBackground();
 
-  if (characterMoving) { // checks to see if characterMoving was properly created, meaning the sprites actually loaded, before it actually draws the character
+  // checks to see if characterMoving was properly created, meaning the sprites actually loaded, before it actually draws the character
+  if (characterMoving) {
     characterMoving.drawCharacter();
   }
 
@@ -211,7 +224,8 @@ const animate = () => {
   }
 };
 
-let lastKey = ""; // this is implemented for smooth movement and to control the animation direction
+// this is implemented for smooth movement and to control the animation direction
+let lastKey = "";
 window.addEventListener("keydown", (evt) => {
   switch (evt.key) {
     case "w":
