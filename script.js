@@ -126,8 +126,8 @@ playerImageWalking.onload = () => {
     spriteCuts: {
       //   sx: 0,
       //   sy: 0,
-      sw: playerImageWalking.width / 5, // 5 becuase there's 5 section on x
-      sh: playerImageWalking.height / 4, // 4 because 4 on why
+      sw: playerImageWalking.width / 5, // 5 becuase there's 5 collumns on sprite sheet
+      sh: playerImageWalking.height / 4, // 4 because 4 rows on sprite sheet
       dw: playerImageWalking.width / 5,
       dh: playerImageWalking.height / 4,
     },
