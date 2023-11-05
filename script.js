@@ -1,5 +1,5 @@
 const canvas = document.querySelector("canvas");
-const ctr = canvas.getContext("2d");
+const ctx = canvas.getContext("2d");
 canvas.width = 304;
 canvas.height = 480;
 
@@ -18,8 +18,8 @@ class Boundary {
   } // height and width is set to 16 because the map assets is 16x16 tileset
 
   draw() {
-    ctr.fillStyle = "rgba(255, 255, 255, 0.5)";
-    ctr.fillRect(this.position.x, this.position.y, this.width, this.height);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 }
 
@@ -55,11 +55,11 @@ class Sprite {
   }
 
   drawBackground() {
-    ctr.drawImage(this.image, 0, 0);
+    ctx.drawImage(this.image, 0, 0);
   }
 
   drawCharacter() {
-    ctr.drawImage(
+    ctx.drawImage(
       this.image,
       this.spriteCuts.val * 32, // This picks the starting point for crop
       this.spriteCuts.valy * 32, // This picks the starting crop direction via Y axis
@@ -185,7 +185,7 @@ const movePlayer = (dx, dy) => { // This function is based the movement amount f
 
 const animate = () => {
   window.requestAnimationFrame(animate);
-  ctr.clearRect(0, 0, canvas.width, canvas.height); // clears the canvas before drawing to avoid potential issues
+  ctx.clearRect(0, 0, canvas.width, canvas.height); // clears the canvas before drawing to avoid potential issues
   background.drawBackground();
 
   if (characterMoving) { // checks to see if characterMoving was properly created, meaning the sprites actually loaded, before it actually draws the character
