@@ -58,7 +58,7 @@ class Sprite {
     ctr.drawImage(this.image, 0, 0);
   }
 
-  drawCharacterMoving() {
+  drawCharacter() {
     ctr.drawImage(
       this.image,
       this.spriteCuts.val * 32,
@@ -187,7 +187,7 @@ const animate = () => {
   background.drawBackground();
 
   if (characterMoving) {
-    characterMoving.drawCharacterMoving();
+    characterMoving.drawCharacter();
   }
 
   let player = {
