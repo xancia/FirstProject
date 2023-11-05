@@ -90,41 +90,44 @@ const animate = () => {
       characterMoving.drawCharacterMoving();
     }
 
-    if (keys.a.pressed) {
-        characterMoving.position.x = characterMoving.position.x - 1
+    if (keys.a.pressed && lastKey === 'a') {
+        characterMoving.position.x -=  1
+    }
+    else if (keys.d.pressed && lastKey === 'd') {
+        characterMoving.position.x +=  1
     }
 
-    if (keys.d.pressed) {
-        characterMoving.position.x = characterMoving.position.x + 1
+    else if (keys.w.pressed && lastKey === 'w') {
+        characterMoving.position.y -=  1
     }
 
-    if (keys.w.pressed) {
-        characterMoving.position.y = characterMoving.position.y - 1
-    }
-
-    if (keys.s.pressed) {
-        characterMoving.position.y = characterMoving.position.y + 1
+    else if (keys.s.pressed && lastKey === 's') {
+        characterMoving.position.y +=  1
     }
 
 }
 
-
+let lastKey = ''
 window.addEventListener("keydown", (evt) => {
   switch (evt.key) {
     case "w":
       keys.w.pressed = true;
+      lastKey = 'w'
       break;
 
     case "a":
       keys.a.pressed = true;
+      lastKey = 'a'
       break;
 
     case "s":
       keys.s.pressed = true;
+      lastKey = 's'
       break;
 
     case "d":
       keys.d.pressed = true;
+      lastKey = 'd'
       break;
   }
 });
