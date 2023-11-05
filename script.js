@@ -50,7 +50,8 @@ class Sprite {
   constructor({ position, image, spriteCuts }) {
     this.position = position;
     this.image = image;
-    this.spriteCuts = spriteCuts;
+    this.spriteCuts = {...spriteCuts, val:0,valy:0, elapsed:0};
+    this.moving = false;
   }
 
   drawBackground() {
@@ -60,8 +61,8 @@ class Sprite {
   drawCharacterMoving() {
     ctr.drawImage(
       this.image,
-      this.spriteCuts.sx,
-      this.spriteCuts.sy,
+      this.spriteCuts.val * 32,
+      this.spriteCuts.valy * 32,
       this.spriteCuts.sw,
       this.spriteCuts.sh,
       this.position.x,
@@ -69,7 +70,20 @@ class Sprite {
       this.spriteCuts.dw,
       this.spriteCuts.dh
     );
-  }
+    
+    if (this.moving) {
+    // this is to slow down the animation
+    
+    this.spriteCuts.elapsed++
+    
+    
+    if (this.spriteCuts.elapsed % 25 === 0) {
+    if (this.spriteCuts.val < 3) {
+        this.spriteCuts.val++
+    } else {
+        this.spriteCuts.val = 0
+    }}
+  }}
 } // this class is used to store the methods for drawing images
 
 const background = new Sprite({
@@ -104,8 +118,8 @@ playerImageWalking.onload = () => {
       y: 400,
     },
     spriteCuts: {
-      sx: 0,
-      sy: 0,
+    //   sx: 0,
+    //   sy: 0,
       sw: playerImageWalking.width / 5,
       sh: playerImageWalking.height / 4,
       dw: playerImageWalking.width / 5,
@@ -134,6 +148,7 @@ const COLLISION_PADDING = {
 }; // This is to add padding since the collision was happening too soon compared to character sprite
 
 const movePlayer = (dx, dy) => {
+    characterMoving.moving = true
   const nextPos = {
     position: {
       x: characterMoving.position.x + dx + COLLISION_PADDING.left,
@@ -179,6 +194,7 @@ const animate = () => {
     position: characterMoving.position,
     width: characterMoving.spriteCuts.sw,
     height: characterMoving.spriteCuts.sh,
+
   };
 
   boundaries.forEach((boundary) => {
@@ -206,21 +222,25 @@ window.addEventListener("keydown", (evt) => {
     case "w":
       keys.w.pressed = true;
       lastKey = "w";
+      characterMoving.spriteCuts.valy = 1
       break;
 
     case "a":
       keys.a.pressed = true;
       lastKey = "a";
+      characterMoving.spriteCuts.valy = 3
       break;
 
     case "s":
       keys.s.pressed = true;
       lastKey = "s";
+      characterMoving.spriteCuts.valy = 0
       break;
 
     case "d":
       keys.d.pressed = true;
       lastKey = "d";
+      characterMoving.spriteCuts.valy = 2
       break;
   }
 });
@@ -229,18 +249,30 @@ window.addEventListener("keyup", (evt) => {
   switch (evt.key) {
     case "w":
       keys.w.pressed = false;
+      characterMoving.moving = false;
+      characterMoving.spriteCuts.elapsed = 0;
+      characterMoving.spriteCuts.val = 1;
       break;
 
     case "a":
       keys.a.pressed = false;
+      characterMoving.moving = false;
+      characterMoving.spriteCuts.elapsed = 0;
+      characterMoving.spriteCuts.val = 1;
       break;
 
     case "s":
       keys.s.pressed = false;
+      characterMoving.moving = false;
+      characterMoving.spriteCuts.elapsed = 0;
+      characterMoving.spriteCuts.val = 1;
       break;
 
     case "d":
       keys.d.pressed = false;
+      characterMoving.moving = false;
+      characterMoving.spriteCuts.elapsed = 0;
+      characterMoving.spriteCuts.val = 1;
       break;
   }
 });
