@@ -6,7 +6,7 @@ canvas.height = 480;
 const collisionsMap = [];
 for (let i = 0; i < collisions.length; i += 19) {
   collisionsMap.push(collisions.slice(i, i + 19));
-} // 19 because there are 19 tiles for the width in tiles, which represent 1 row
+} // 19 because there are 19 tiles for the width in tiles, which represent 1 row. Each row is pushed into the collision map as a single array for organization
 
 class Boundary {
   static width = 16;
@@ -50,7 +50,7 @@ class Sprite {
   constructor({ position, image, spriteCuts }) {
     this.position = position;
     this.image = image;
-    this.spriteCuts = {...spriteCuts, val:0,valy:0, elapsed:0};
+    this.spriteCuts = { ...spriteCuts, val: 0, valy: 0, elapsed: 0 };
     this.moving = false;
   }
 
@@ -61,29 +61,30 @@ class Sprite {
   drawCharacter() {
     ctr.drawImage(
       this.image,
-      this.spriteCuts.val * 32,
-      this.spriteCuts.valy * 32,
-      this.spriteCuts.sw,
-      this.spriteCuts.sh,
-      this.position.x,
-      this.position.y,
-      this.spriteCuts.dw,
-      this.spriteCuts.dh
+      this.spriteCuts.val * 32, // This picks the starting point for crop
+      this.spriteCuts.valy * 32, // This picks the starting crop direction via Y axis
+      this.spriteCuts.sw, // crop width - how far to crop on x axis
+      this.spriteCuts.sh, // crop height - how far to crop on y axis
+      this.position.x, // starting position x
+      this.position.y, // starting position y
+      this.spriteCuts.dw, // rendering width - actual width use same as sw
+      this.spriteCuts.dh // rendering height - actual height same as sh
     );
-    
+
     if (this.moving) {
-    // this is to slow down the animation
-    
-    this.spriteCuts.elapsed++
-    
-    
-    if (this.spriteCuts.elapsed % 25 === 0) {
-    if (this.spriteCuts.val < 3) {
-        this.spriteCuts.val++
-    } else {
-        this.spriteCuts.val = 0
-    }}
-  }}
+      // this is to slow down the animation
+
+      this.spriteCuts.elapsed++;
+
+      if (this.spriteCuts.elapsed % 25 === 0) {
+        if (this.spriteCuts.val < 3) {
+          this.spriteCuts.val++;
+        } else {
+          this.spriteCuts.val = 0;
+        }
+      }
+    }
+  }
 } // this class is used to store the methods for drawing images
 
 const background = new Sprite({
@@ -111,17 +112,17 @@ const keys = {
 
 let characterMoving;
 
-playerImageWalking.onload = () => {
+playerImageWalking.onload = () => { // only run this function to create the character for drawing if the sprite is loaded
   characterMoving = new Sprite({
     position: {
       x: 136,
       y: 400,
     },
     spriteCuts: {
-    //   sx: 0,
-    //   sy: 0,
-      sw: playerImageWalking.width / 5,
-      sh: playerImageWalking.height / 4,
+      //   sx: 0,
+      //   sy: 0,
+      sw: playerImageWalking.width / 5, // 5 becuase there's 5 section on x
+      sh: playerImageWalking.height / 4, // 4 because 4 on why
       dw: playerImageWalking.width / 5,
       dh: playerImageWalking.height / 4,
     },
@@ -131,6 +132,7 @@ playerImageWalking.onload = () => {
   animate();
 };
 
+// This checks if parameter 1 is colliding with parameter 2
 const rectangularCollision = function ({ rectangle1, rectangle2 }) {
   return (
     rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
@@ -147,9 +149,9 @@ const COLLISION_PADDING = {
   right: 10,
 }; // This is to add padding since the collision was happening too soon compared to character sprite
 
-const movePlayer = (dx, dy) => {
-    characterMoving.moving = true
-  const nextPos = {
+const movePlayer = (dx, dy) => { // This function is based the movement amount from animate function
+  characterMoving.moving = true; 
+  const nextPos = { // This calculates the next position before the character actually moves
     position: {
       x: characterMoving.position.x + dx + COLLISION_PADDING.left,
       y: characterMoving.position.y + dy + COLLISION_PADDING.top,
@@ -172,7 +174,7 @@ const movePlayer = (dx, dy) => {
         rectangle2: boundary,
       })
     ) {
-      return false; // This for loop checks via the rectangularCollision function to see if the player and the boundary are overlapping
+      return false; // This for loop checks via the rectangularCollision function using nextpos to see if the player and the boundary are overlapping, if it does, it will return and exit the function before movement happens
     }
   }
 
@@ -183,25 +185,18 @@ const movePlayer = (dx, dy) => {
 
 const animate = () => {
   window.requestAnimationFrame(animate);
-  ctr.clearRect(0, 0, canvas.width, canvas.height);
+  ctr.clearRect(0, 0, canvas.width, canvas.height); // clears the canvas before drawing to avoid potential issues
   background.drawBackground();
 
-  if (characterMoving) {
+  if (characterMoving) { // checks to see if characterMoving was properly created, meaning the sprites actually loaded, before it actually draws the character
     characterMoving.drawCharacter();
   }
-
-  let player = {
-    position: characterMoving.position,
-    width: characterMoving.spriteCuts.sw,
-    height: characterMoving.spriteCuts.sh,
-
-  };
 
   boundaries.forEach((boundary) => {
     boundary.draw();
   });
 
-  // These call the moveplayer function
+  // These call the moveplayer function and pass it the direction to move
   if (keys.a.pressed && lastKey === "a") {
     movePlayer(-1, 0);
   }
@@ -216,35 +211,36 @@ const animate = () => {
   }
 };
 
-let lastKey = "";
+let lastKey = ""; // this is implemented for smooth movement and to control the animation direction
 window.addEventListener("keydown", (evt) => {
   switch (evt.key) {
     case "w":
       keys.w.pressed = true;
       lastKey = "w";
-      characterMoving.spriteCuts.valy = 1
+      characterMoving.spriteCuts.valy = 1;
       break;
 
     case "a":
       keys.a.pressed = true;
       lastKey = "a";
-      characterMoving.spriteCuts.valy = 3
+      characterMoving.spriteCuts.valy = 3;
       break;
 
     case "s":
       keys.s.pressed = true;
       lastKey = "s";
-      characterMoving.spriteCuts.valy = 0
+      characterMoving.spriteCuts.valy = 0;
       break;
 
     case "d":
       keys.d.pressed = true;
       lastKey = "d";
-      characterMoving.spriteCuts.valy = 2
+      characterMoving.spriteCuts.valy = 2;
       break;
   }
 });
 
+// This event is for stopping movement and for reseting values
 window.addEventListener("keyup", (evt) => {
   switch (evt.key) {
     case "w":
