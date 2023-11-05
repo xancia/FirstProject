@@ -64,7 +64,7 @@ class Sprite {
   drawCharacter() {
     ctx.drawImage(
       this.image,
-      this.spriteCuts.val * 32, // This picks the starting point for crop
+      this.spriteCuts.val * 32, // This picks the starting point for crop. 32 because character sprite is 32x32
       this.spriteCuts.valy * 32, // This picks the starting crop direction via Y axis
       this.spriteCuts.sw, // crop width - how far to crop on x axis
       this.spriteCuts.sh, // crop height - how far to crop on y axis
@@ -77,7 +77,7 @@ class Sprite {
     if (this.moving) {
     
       // this is to slow down the animation
-      
+
       this.spriteCuts.elapsed++;
 
       if (this.spriteCuts.elapsed % 25 === 0) {
