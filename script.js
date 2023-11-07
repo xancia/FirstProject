@@ -34,7 +34,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = 1280;
 canvas.height = 720;
 
-const COLLISION_PADDING = { top: 5, bottom: 0, left: 10, right: 10 };
+const COLLISION_PADDING = { top: 15, bottom: 5, left: 15, right: 15 };
 const keys = {
   w: { pressed: false },
   a: { pressed: false },
@@ -399,7 +399,7 @@ async function loadAssetsAndStartGame() {
     });
 
     characterMoving = new Sprite({
-      position: { x: canvas.width / 2, y: canvas.height / 2 },
+      position: { x: canvas.width / 2, y: canvas.height / 3 },
       image: playerWalk,
       spriteCuts: {
         sw: playerWalk.width / 5, 
