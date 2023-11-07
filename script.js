@@ -233,8 +233,8 @@ function animate() {
 }
 
 function drawHealthBar() {
-  const healthBarWidth = 30; // Width of the health bar, adjust as needed
-  const healthBarHeight = 5; // Height of the health bar, adjust as needed
+  const healthBarWidth = 30; // Width of the health bar
+  const healthBarHeight = 5; // Height of the health bar
   const xOffset = 0; // X offset from the center of the player
   const yOffset = 5; // Y offset from the bottom of the player
 
