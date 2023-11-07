@@ -34,7 +34,6 @@ const ctx = canvas.getContext("2d");
 canvas.width = 1280;
 canvas.height = 720;
 
-
 const COLLISION_PADDING = { top: 5, bottom: 0, left: 10, right: 10 };
 const keys = {
   w: { pressed: false },
@@ -66,10 +65,23 @@ class Boundary {
 }
 
 class Sprite {
-  constructor({ position, image, spriteCuts, totalFrames, animationSpeed = 25 }) {
+  constructor({
+    position,
+    image,
+    spriteCuts,
+    totalFrames,
+    animationSpeed = 25,
+  }) {
     this.position = position;
     this.image = image;
-    this.spriteCuts = { ...spriteCuts, val: 0, valy: 0, elapsed: 0, totalFrames, animationSpeed };
+    this.spriteCuts = {
+      ...spriteCuts,
+      val: 0,
+      valy: 0,
+      elapsed: 0,
+      totalFrames,
+      animationSpeed,
+    };
     this.moving = false;
   }
 
@@ -93,7 +105,8 @@ class Sprite {
     if (this.moving) {
       this.spriteCuts.elapsed++;
       if (this.spriteCuts.elapsed % this.spriteCuts.animationSpeed === 0) {
-        this.spriteCuts.val = (this.spriteCuts.val + 1) % (this.spriteCuts.totalFrames.x - 1); // Looping through the horizontal frames
+        this.spriteCuts.val =
+          (this.spriteCuts.val + 1) % (this.spriteCuts.totalFrames.x - 1); // Looping through the horizontal frames minus 1
       }
     } else {
       // If the character is not moving, you might want to reset to a specific frame
@@ -183,8 +196,6 @@ function attackPlayer() {
   }
 }
 
-
-
 function animate() {
   animationFrameId = requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -227,20 +238,25 @@ function drawHealthBar() {
   const yOffset = 5; // Y offset from the bottom of the player
 
   // The X and Y position of the health bar should be centered below the player
-  const x = characterMoving.position.x + characterMoving.spriteCuts.dw / 2 - healthBarWidth / 2 + xOffset;
-  const y = characterMoving.position.y + characterMoving.spriteCuts.dh + yOffset;
+  const x =
+    characterMoving.position.x +
+    characterMoving.spriteCuts.dw / 2 -
+    healthBarWidth / 2 +
+    xOffset;
+  const y =
+    characterMoving.position.y + characterMoving.spriteCuts.dh + yOffset;
 
   // Draw the background of the health bar
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
   ctx.fillRect(x, y, healthBarWidth, healthBarHeight);
 
   // Draw the foreground of the health bar
   const healthPercentage = playerHealth / maxPlayerHealth;
-  ctx.fillStyle = 'rgba(255, 0, 0, 0.7)';
+  ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
   ctx.fillRect(x, y, healthBarWidth * healthPercentage, healthBarHeight);
 
   // Draw the health bar border
-  ctx.strokeStyle = 'white';
+  ctx.strokeStyle = "white";
   ctx.strokeRect(x, y, healthBarWidth, healthBarHeight);
 }
 
@@ -249,18 +265,22 @@ function updateHealth() {
   const now = Date.now();
 
   // Check if a zombie is touching the player
-  if (zombieEnemy && characterMoving && rectangularCollision({
-    rectangle1: {
-      position: characterMoving.position,
-      width: characterMoving.spriteCuts.dw,
-      height: characterMoving.spriteCuts.dh
-    },
-    rectangle2: {
-      position: zombieEnemy.position,
-      width: zombieEnemy.spriteCuts.dw,
-      height: zombieEnemy.spriteCuts.dh
-    }
-  })) {
+  if (
+    zombieEnemy &&
+    characterMoving &&
+    rectangularCollision({
+      rectangle1: {
+        position: characterMoving.position,
+        width: characterMoving.spriteCuts.dw,
+        height: characterMoving.spriteCuts.dh,
+      },
+      rectangle2: {
+        position: zombieEnemy.position,
+        width: zombieEnemy.spriteCuts.dw,
+        height: zombieEnemy.spriteCuts.dh,
+      },
+    })
+  ) {
     // Check if it's been at least 1 second since the last health drop
     if (now - lastHealthDropTime >= 1000) {
       playerHealth -= 10; // Decrease health by 10
@@ -274,12 +294,13 @@ function updateHealth() {
   // If health is 0, handle the player's death (game over, etc.)
   if (playerHealth <= 0) {
     console.log("Player is dead!");
-    stopAnimation()
+    stopAnimation();
   }
 }
 
 function startAnimation() {
-  if (!animationFrameId) { // Prevent multiple loops from starting
+  if (!animationFrameId) {
+    // Prevent multiple loops from starting
     animate(); // Start the animation loop
   }
 }
@@ -381,26 +402,26 @@ async function loadAssetsAndStartGame() {
       position: { x: canvas.width / 2, y: canvas.height / 2 },
       image: playerWalk,
       spriteCuts: {
-        sw: playerWalk.width / 5, // Player has 5 frames but you only want to use 4
+        sw: playerWalk.width / 5, 
         sh: playerWalk.height / 4,
         dw: playerWalk.width / 5,
         dh: playerWalk.height / 4,
       },
-      totalFrames: { x: 5, y: 4 }, // Only using 4 of the 5 frames
-      animationSpeed: 25
+      totalFrames: { x: 5, y: 4 }, 
+      animationSpeed: 25,
     });
 
     zombieEnemy = new Sprite({
       position: { x: 500, y: 300 },
       image: zombieWalk,
       spriteCuts: {
-        sw: zombieWalk.width / 11, // Zombie has 11 frames but you only want to use 10
+        sw: zombieWalk.width / 11, 
         sh: zombieWalk.height / 4,
         dw: zombieWalk.width / 11,
         dh: zombieWalk.height / 4,
       },
-      totalFrames: { x: 11, y: 4 }, // Only using 10 of the 11 frames
-      animationSpeed: 25
+      totalFrames: { x: 11, y: 4 }, 
+      animationSpeed: 25,
     });
 
     animate(); // Start the animation loop
