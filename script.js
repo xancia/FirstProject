@@ -348,10 +348,10 @@ window.addEventListener("keydown", (event) => {
     case "Escape":
       keys.Escape.pressed = true;
       if (animationFrameId) {
-        stopAnimation()} 
-        else {
-          startAnimation()
-        }
+        stopAnimation();
+      } else {
+        startAnimation();
+      }
       break;
   }
 });
