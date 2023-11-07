@@ -122,17 +122,16 @@ for (let i = 0; i < collisions.length; i += 80) {
   collisionsMap.push(collisions.slice(i, i + 80));
 }
 
-const boundaries = collisionsMap
-  .flatMap((row, i) =>
-    row.map((cell, j) =>
-      cell === 257
-        ? new Boundary({
-            position: { x: j * Boundary.width, y: i * Boundary.height },
-          })
-        : null
-    )
-  )
-  .filter(Boolean);
+const boundaries = [];
+collisionsMap.forEach((row, i) => {
+  row.forEach((cell, j) => {
+    if (cell === 257) {
+      boundaries.push(new Boundary({
+        position: { x: j * Boundary.width, y: i * Boundary.height },
+      }));
+    }
+  });
+});
 
 // ----- Game Functions -----
 function movePlayer(dx, dy) {
