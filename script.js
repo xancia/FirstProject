@@ -40,6 +40,7 @@ const keys = {
   a: { pressed: false },
   s: { pressed: false },
   d: { pressed: false },
+  Escape: { pressed: false },
 };
 let lastKey = "";
 let characterMoving, zombieEnemy, background;
@@ -343,6 +344,15 @@ window.addEventListener("keydown", (event) => {
       characterMoving.spriteCuts.valy = 2;
       characterMoving.moving = true;
       break;
+
+    case "Escape":
+      keys.Escape.pressed = true;
+      if (animationFrameId) {
+        stopAnimation()} 
+        else {
+          startAnimation()
+        }
+      break;
   }
 });
 
@@ -363,6 +373,10 @@ window.addEventListener("keyup", (event) => {
 
     case "d":
       keys.d.pressed = false;
+      break;
+
+    case "Escape":
+      keys.esc.pressed = false;
       break;
   }
   // If none of the movement keys are pressed, set moving to false
@@ -402,12 +416,12 @@ async function loadAssetsAndStartGame() {
       position: { x: canvas.width / 2, y: canvas.height / 3 },
       image: playerWalk,
       spriteCuts: {
-        sw: playerWalk.width / 5, 
+        sw: playerWalk.width / 5,
         sh: playerWalk.height / 4,
         dw: playerWalk.width / 5,
         dh: playerWalk.height / 4,
       },
-      totalFrames: { x: 5, y: 4 }, 
+      totalFrames: { x: 5, y: 4 },
       animationSpeed: 25,
     });
 
@@ -415,12 +429,12 @@ async function loadAssetsAndStartGame() {
       position: { x: 500, y: 300 },
       image: zombieWalk,
       spriteCuts: {
-        sw: zombieWalk.width / 11, 
+        sw: zombieWalk.width / 11,
         sh: zombieWalk.height / 4,
         dw: zombieWalk.width / 11,
         dh: zombieWalk.height / 4,
       },
-      totalFrames: { x: 11, y: 4 }, 
+      totalFrames: { x: 11, y: 4 },
       animationSpeed: 25,
     });
 
