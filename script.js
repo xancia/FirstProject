@@ -272,13 +272,13 @@ function updateHealth() {
     rectangularCollision({
       rectangle1: {
         position: characterMoving.position,
-        width: characterMoving.spriteCuts.dw,
-        height: characterMoving.spriteCuts.dh,
+        width: characterMoving.spriteCuts.dw - 20,
+        height: characterMoving.spriteCuts.dh - 10,
       },
       rectangle2: {
         position: zombieEnemy.position,
-        width: zombieEnemy.spriteCuts.dw,
-        height: zombieEnemy.spriteCuts.dh,
+        width: zombieEnemy.spriteCuts.dw - 20,
+        height: zombieEnemy.spriteCuts.dh - 10,
       },
     })
   ) {
