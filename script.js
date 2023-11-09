@@ -264,7 +264,7 @@ function attackPlayer() {
   const speed = 0.2; // Adjust speed of zombie
 
   // Only move the zombie if it's not too close to the player
-  if (distance > Boundary.width / 2) {
+  if (distance > 10) {
     zombieEnemy.moving = true; // Set moving to true since the zombie is about to move
     zombieEnemy.position.x += (dx / distance) * speed;
     zombieEnemy.position.y += (dy / distance) * speed;
@@ -314,16 +314,16 @@ function animate() {
   fireBullet();
 }
 
-// Draws shooting animation at player position and removes event listeners so player stays in place until finished
+// Draws shooting animation at player position and removes event listeners and set moving to false so player stays in place until finished
 function shootGun() {
   if (characterShooting && isPlayerShooting) {
-    characterShooting.position.x = currentPlayerPosition.x;
+    characterShooting.position.x = currentPlayerPosition.x; // Set's the shooting animation to be on top of the player to be drawn
     characterShooting.position.y = currentPlayerPosition.y;
     characterShooting.drawCharacterShooting();
     characterShooting.moving = true;
     
   }
-  if (characterShooting.spriteCuts.elapsed < 75) {
+  if (characterShooting.spriteCuts.elapsed < 75) { // Wait for animation to play before letting the player move
     window.removeEventListener("keydown", keyDownFunction);
     window.removeEventListener("keyup", keyUpFunction);
     characterMoving.moving = false;
@@ -341,6 +341,8 @@ function fireBullet() {
   if (keys.enter.pressed) {
     bullets.forEach((bullet, index) => {
       bullet.updateBullet(); // Update position and draw
+
+      //sets the right sprite animation - currently semi-broken
       if (lastKey === "a") {
         bullet.spriteCuts.valy = 3;
       } else if (lastKey === "w") {
@@ -352,7 +354,8 @@ function fireBullet() {
       }
     
       bullet.moving = true;
-      // Check for offscreen bullets to remove
+
+      // Check for collision and off screen and removes the bullet
       if (bulletIsOffscreen(bullet)) {
         bullets.splice(index, 1);
       }
@@ -364,6 +367,7 @@ function fireBullet() {
   
 }
 
+// Checks if bullet is going off the map
 function bulletIsOffscreen(bullet) {
   return (
     bullet.position.x + bullet.spriteCuts.dw < 0 ||
@@ -373,6 +377,7 @@ function bulletIsOffscreen(bullet) {
   );
 }
 
+// checks if bullet is colliding with the zombie
 function bulletHitZombie(bullet) {
   return (
     rectangularCollision({
@@ -472,7 +477,7 @@ function stopAnimation() {
 }
 
 function keyDownFunction(event) {
-  // Handle key down logic
+  // Handle key down logic and choosing the right sprite animation based on direction
   switch (event.key) {
     case "w":
       keys.w.pressed = true;
@@ -516,7 +521,7 @@ function keyDownFunction(event) {
       let speed = 2; // Bullet speed
       let velocity;
 
-      
+      // set's velocity to be in the direction character is facing
       if (lastKey === "a") {
         characterShooting.spriteCuts.valy = 3;
         velocity = { x: -speed, y: 0 };
@@ -531,6 +536,7 @@ function keyDownFunction(event) {
         velocity = { x: speed, y: 0 };
       }
 
+      // checks if a velocity exists and creates a new bullet sprite to store in the bullets[]
       if(velocity) {
       const bulletSprite = new Sprite({
         position: { x: characterMoving.position.x - 10, y: characterMoving.position.y - 3 },
@@ -546,10 +552,10 @@ function keyDownFunction(event) {
         velocity: velocity
       });
       bullets.push(bulletSprite)
-      // keys.enter.pressed = false; // prevent continuous firing
+      // keys.enter.pressed = false; // prevent continuous firing - I don't think this matters
     }
 
-      currentPlayerPosition.x = characterMoving.position.x;
+      currentPlayerPosition.x = characterMoving.position.x; // Saves character position for use such as drawing the shooting animation where the character is
       currentPlayerPosition.y = characterMoving.position.y;
       keys.enter.pressed = true;
       isPlayerShooting = true;
@@ -662,7 +668,7 @@ async function loadAssetsAndStartGame() {
       animationSpeed: 25,
     });
 
-    bullet = bulletImage
+    bullet = bulletImage // saves bulletImage to the global scope bullet variable to be used in creating new bullets
 
     animate(); // Start the animation loop
   } catch (error) {
