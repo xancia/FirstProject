@@ -356,6 +356,9 @@ function fireBullet() {
       if (bulletIsOffscreen(bullet)) {
         bullets.splice(index, 1);
       }
+      if (bulletHitZombie(bullet)) {
+        bullets.splice(index, 1);
+      }
     });
   }
   
@@ -367,7 +370,11 @@ function bulletIsOffscreen(bullet) {
     bullet.position.x > canvas.width ||
     bullet.position.y + bullet.spriteCuts.dh < 0 ||
     bullet.position.y > canvas.height 
-    ||
+  );
+}
+
+function bulletHitZombie(bullet) {
+  return (
     rectangularCollision({
       rectangle1: {
         position: bullet.position,
