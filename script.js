@@ -290,12 +290,28 @@ function animate() {
   }
 
   // Shoot projectile in the faced direction when enter is pressed
-  fireBullet()
+  if (keys.enter.pressed) {
+  shootGun()
+} 
+fireBullet()
+
 }
 
 function shootGun() {
   if (characterShooting && isPlayerShooting) {
-
+    characterShooting.position.x = currentPlayerPosition.x
+    characterShooting.position.y = currentPlayerPosition.y
+    characterShooting.drawCharacterShooting()
+    characterShooting.moving = true;
+  }
+  if (characterShooting.spriteCuts.elapsed < 75) {
+    window.removeEventListener("keydown", keyDownFunction);
+    window.removeEventListener("keyup", keyUpFunction);
+  } else {
+    window.addEventListener("keydown", keyDownFunction);
+  window.addEventListener("keyup", keyUpFunction);
+    isPlayerShooting = false;
+    characterShooting.moving = false;
   }
 }
 
@@ -389,8 +405,7 @@ function stopAnimation() {
   }
 }
 
-// ----- Event Listeners -----
-window.addEventListener("keydown", (event) => {
+function keyDownFunction(event) {
   // Handle key down logic
   switch (event.key) {
     case "w":
@@ -431,13 +446,44 @@ window.addEventListener("keydown", (event) => {
       break;
 
     case "Enter":
+      if (lastKey === "a") {
+        characterShooting.spriteCuts.valy = 3;
+        bulletSprite.spriteCuts.valy = 3;
+        bulletLeft = -1;
+        bulletRight = 0;
+        bulletDown = 0;
+        bulletUp = 0;
+      } else if (lastKey === "w") {
+        characterShooting.spriteCuts.valy = 1;
+        bulletSprite.spriteCuts.valy = 0;
+        bulletUp = -1;
+        bulletDown = 0;
+        bulletRight = 0;
+        bulletLeft = 0;
+      } else if (lastKey === "s") {
+        characterShooting.spriteCuts.valy = 0;
+        bulletSprite.spriteCuts.valy = 1;
+        bulletDown = 1;
+        bulletUp = 0
+        bulletRight = 0;
+        bulletLeft = 0;
+      } else if (lastKey === "d") {
+        characterShooting.spriteCuts.valy = 2;
+        bulletSprite.spriteCuts.valy = 2;
+        bulletRight = 1;
+        bulletLeft = 0;
+        bulletDown = 0;
+        bulletUp = 0;
+      }
+      currentPlayerPosition.x = characterMoving.position.x;
+      currentPlayerPosition.y = characterMoving.position.y
       keys.enter.pressed = true;
       isPlayerShooting = true;
       break;
   }
-});
+}
 
-window.addEventListener("keyup", (event) => {
+function keyUpFunction(event) {
   // Handle key up logic
   switch (event.key) {
     case "w":
@@ -475,40 +521,15 @@ window.addEventListener("keyup", (event) => {
   }
 
   if (!keys.enter.pressed) {
-    if (lastKey === "a") {
-      characterShooting.spriteCuts.valy = 3;
-      bulletSprite.spriteCuts.valy = 3;
-      bulletLeft = -1;
-      bulletRight = 0;
-      bulletDown = 0;
-      bulletUp = 0;
-    } else if (lastKey === "w") {
-      characterShooting.spriteCuts.valy = 1;
-      bulletSprite.spriteCuts.valy = 0;
-      bulletUp = -1;
-      bulletDown = 0;
-      bulletRight = 0;
-      bulletLeft = 0;
-    } else if (lastKey === "s") {
-      characterShooting.spriteCuts.valy = 0;
-      bulletSprite.spriteCuts.valy = 1;
-      bulletDown = 1;
-      bulletUp = 0
-      bulletRight = 0;
-      bulletLeft = 0;
-    } else if (lastKey === "d") {
-      characterShooting.spriteCuts.valy = 2;
-      bulletSprite.spriteCuts.valy = 2;
-      bulletRight = 1;
-      bulletLeft = 0;
-      bulletDown = 0;
-      bulletUp = 0;
-    }
-    currentPlayerPosition.x = characterMoving.position.x;
-    currentPlayerPosition.y = characterMoving.position.y
+    
   }
 
-});
+}
+
+// ----- Event Listeners -----
+window.addEventListener("keydown", keyDownFunction);
+
+window.addEventListener("keyup", keyUpFunction);
 
 // ----- Asset Loading and Game Initialization -----
 async function loadAssetsAndStartGame() {
