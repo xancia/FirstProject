@@ -43,6 +43,7 @@ function createZombie() {
     totalFrames: { x: 11, y: 4 },
     animationSpeed: 25,
   });
+  zombieEnemy.health = 100;
   zombies.push(zombieEnemy);
 }
 
@@ -380,11 +381,12 @@ function fireBullet() {
     if (bulletIsOffscreen(bullet)) {
       bullets.splice(index, 1);
     }
-    for (let zombie of zombies) {
+    zombies.forEach((zombie, zIndex) => {
       if (bulletHitZombie(bullet, zombie)) {
         bullets.splice(index, 1);
+        updateZombieHealth(zombie,bullet,zIndex)
       }
-    }
+    })
   });
 }
 
@@ -478,6 +480,34 @@ function updateHealth(zombie) {
   if (playerHealth <= 0) {
     console.log("Player is dead!");
     stopAnimation();
+  }
+}
+
+function updateZombieHealth(zombie, bullet, index) {
+
+  // Check if a zombie is touching a bullet
+  if (
+    zombie &&
+    bullet &&
+    rectangularCollision({
+      rectangle1: {
+        position: bullet.position,
+        width: bullet.spriteCuts.dw - 20,
+        height: bullet.spriteCuts.dh - 10,
+      },
+      rectangle2: {
+        position: zombie.position,
+        width: zombie.spriteCuts.dw - 20,
+        height: zombie.spriteCuts.dh - 10,
+      },
+    })
+  ) {
+      zombie.health -= 10; // Decrease health by 10
+  }
+
+  // If health is 0, handle the player's death (game over, etc.)
+  if (zombie.health <= 0) {
+    zombies.splice(index, 1)
   }
 }
 
