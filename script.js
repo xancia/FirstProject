@@ -393,6 +393,7 @@ function attackPlayer(zombie) {
   }
 }
 
+// Main Core game function that handles all of the logic and calls every other function when needed
 function animate() {
   animationFrameId = requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
