@@ -36,20 +36,20 @@ function getRandomNumber(min, max) {
 
 // Function to create a zombie and push it into the zombies[] array
 function createZombie() {
-  let zombieSpawnGenerator = getRandomNumber(1,4)
-  let zombieSpawnLeftSide = {x: 0, y: getRandomNumber(0, 720)}
-  let zombieSpawnRightSide = {x: 1280, y: getRandomNumber(0, 720)}
-  let zombieSpawnTopSide = {x: getRandomNumber(0, 1280), y: 0}
-  let zombieSpawnBottomSide = {x: getRandomNumber(0, 1280), y: 720}
-  let zombieSpawnSpots = {}
+  let zombieSpawnGenerator = getRandomNumber(1, 4);
+  let zombieSpawnLeftSide = { x: 0, y: getRandomNumber(0, 720) };
+  let zombieSpawnRightSide = { x: 1280, y: getRandomNumber(0, 720) };
+  let zombieSpawnTopSide = { x: getRandomNumber(0, 1280), y: 0 };
+  let zombieSpawnBottomSide = { x: getRandomNumber(0, 1280), y: 720 };
+  let zombieSpawnSpots = {};
   if (zombieSpawnGenerator == 1) {
-    zombieSpawnSpots = zombieSpawnLeftSide
+    zombieSpawnSpots = zombieSpawnLeftSide;
   } else if (zombieSpawnGenerator == 2) {
-    zombieSpawnSpots = zombieSpawnRightSide
+    zombieSpawnSpots = zombieSpawnRightSide;
   } else if (zombieSpawnGenerator == 3) {
-    zombieSpawnSpots = zombieSpawnTopSide
+    zombieSpawnSpots = zombieSpawnTopSide;
   } else if (zombieSpawnGenerator == 4) {
-    zombieSpawnSpots = zombieSpawnBottomSide
+    zombieSpawnSpots = zombieSpawnBottomSide;
   }
   let zombieEnemy = new Sprite({
     position: zombieSpawnSpots,
@@ -67,15 +67,15 @@ function createZombie() {
   zombies.push(zombieEnemy);
 }
 
-setInterval(createZombie, 5000); // using set interval to create a zombie every x * 1000 seconds
+setInterval(createZombie, 3000); // using set interval to create a zombie every x * 1000 seconds
 
 // Function to draw a game over screen, used when player dies
 function drawGameOverScreen() {
-  // Dim the background
+  // Dim background
   ctx.fillStyle = "rgba(0, 0, 0, 0.5)"; // semi-transparent black
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Draw the game over box
+  // Draw game over box
   const boxWidth = 400;
   const boxHeight = 200;
   const boxX = canvas.width / 2 - boxWidth / 2;
@@ -83,18 +83,18 @@ function drawGameOverScreen() {
   ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; // semi-transparent white
   ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
 
-  // Draw the game over text
-  ctx.fillStyle = "#000"; 
+  // Draw game over text
+  ctx.fillStyle = "#000";
   ctx.font = "30px Arial";
   ctx.textAlign = "center";
   ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 50);
 
-  // Draw the try again button
-  ctx.fillStyle = "#000"; 
+  // Draw try again button
+  ctx.fillStyle = "#000";
   ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
 
-  // Draw the try again button text
-  ctx.fillStyle = "#FFF"; 
+  // Draw try again button text
+  ctx.fillStyle = "#FFF";
   ctx.font = "20px Arial";
   ctx.fillText("Try Again", canvas.width / 2, canvas.height / 2 + 50);
 
@@ -121,17 +121,17 @@ function tryAgain(event) {
 
 // Function to reset values and set gameOver to false
 function restartGame() {
-  zombies = []
-  bullets = []
+  zombies = [];
+  bullets = [];
   playerHealth = 100;
   zombiesKilled = 0;
   currentPlayerPosition = { x: 0, y: 0 };
   characterMoving.position.x = canvas.width / 2;
   characterMoving.position.y = canvas.height / 3;
-  killCount.textContent = 'Current Kill Count: 0'
+  killCount.textContent = "Current Kill Count: 0";
   canvas.removeEventListener("click", tryAgain);
   gameOver = false;
-  requestAnimationFrame(animate)
+  requestAnimationFrame(animate);
 }
 
 // ----- Global Variables -----
