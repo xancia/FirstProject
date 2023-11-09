@@ -29,6 +29,25 @@ function checkCollision(nextPos) {
   );
 }
 
+// Function to create a zombie and push it into the zombies[] array
+function createZombie() {
+  let zombieEnemy = new Sprite({
+    position: { x: 500, y: 300 },
+    image: zombieImage,
+    spriteCuts: {
+      sw: zombieImage.width / 11,
+      sh: zombieImage.height / 4,
+      dw: zombieImage.width / 11,
+      dh: zombieImage.height / 4,
+    },
+    totalFrames: { x: 11, y: 4 },
+    animationSpeed: 25,
+  });
+  zombies.push(zombieEnemy);
+}
+
+setInterval(createZombie, 5000); // using set interval to create a zombie every x * 1000 seconds
+
 // ----- Global Variables -----
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -51,10 +70,12 @@ let characterMoving,
   characterShooting,
   bulletDirection,
   bullet,
-  bulletFacingDirection;
+  bulletFacingDirection,
+  zombieImage;
 let playerHealth = 100;
 let currentPlayerPosition = { x: 0, y: 0 };
 let bullets = [];
+let zombies = [];
 let bulletLeft = 0;
 let bulletRight = 0;
 let bulletUp = 0;
@@ -255,21 +276,21 @@ function movePlayer(dx, dy) {
   return false; // Movement was blocked by a collision
 }
 
-function attackPlayer() {
-  if (!zombieEnemy || !characterMoving) return;
+function attackPlayer(zombie) {
+  if (!zombie || !characterMoving) return;
 
-  const dx = characterMoving.position.x - zombieEnemy.position.x;
-  const dy = characterMoving.position.y - zombieEnemy.position.y;
+  const dx = characterMoving.position.x - zombie.position.x;
+  const dy = characterMoving.position.y - zombie.position.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
   const speed = 0.2; // Adjust speed of zombie
 
   // Only move the zombie if it's not too close to the player
   if (distance > 10) {
-    zombieEnemy.moving = true; // Set moving to true since the zombie is about to move
-    zombieEnemy.position.x += (dx / distance) * speed;
-    zombieEnemy.position.y += (dy / distance) * speed;
+    zombie.moving = true; // Set moving to true since the zombie is about to move
+    zombie.position.x += (dx / distance) * speed;
+    zombie.position.y += (dy / distance) * speed;
   } else {
-    zombieEnemy.moving = false; // Set moving to false if the zombie is too close to the player
+    zombie.moving = false; // Set moving to false if the zombie is too close to the player
   }
 }
 
@@ -283,12 +304,14 @@ function animate() {
     characterMoving.drawCharacter();
   }
 
-  if (zombieEnemy) {
-    attackPlayer();
-    zombieEnemy.drawCharacter();
+  for (let zombie of zombies) {
+    if (zombie) {
+      attackPlayer(zombie);
+      zombie.drawCharacter();
+      updateHealth(zombie);
+    }
   }
 
-  updateHealth();
   drawHealthBar();
 
   boundaries.forEach((boundary) => boundary.draw());
@@ -357,8 +380,10 @@ function fireBullet() {
     if (bulletIsOffscreen(bullet)) {
       bullets.splice(index, 1);
     }
-    if (bulletHitZombie(bullet)) {
-      bullets.splice(index, 1);
+    for (let zombie of zombies) {
+      if (bulletHitZombie(bullet, zombie)) {
+        bullets.splice(index, 1);
+      }
     }
   });
 }
@@ -374,7 +399,7 @@ function bulletIsOffscreen(bullet) {
 }
 
 // checks if bullet is colliding with the zombie
-function bulletHitZombie(bullet) {
+function bulletHitZombie(bullet, zombie) {
   return rectangularCollision({
     rectangle1: {
       position: bullet.position,
@@ -382,9 +407,9 @@ function bulletHitZombie(bullet) {
       height: bullet.spriteCuts.dh - 25,
     },
     rectangle2: {
-      position: zombieEnemy.position,
-      width: zombieEnemy.spriteCuts.dw - 30,
-      height: zombieEnemy.spriteCuts.dh - 15,
+      position: zombie.position,
+      width: zombie.spriteCuts.dw - 30,
+      height: zombie.spriteCuts.dh - 15,
     },
   });
 }
@@ -418,13 +443,13 @@ function drawHealthBar() {
   ctx.strokeRect(x, y, healthBarWidth, healthBarHeight);
 }
 
-function updateHealth() {
+function updateHealth(zombie) {
   // Get the current time
   const now = Date.now();
 
   // Check if a zombie is touching the player
   if (
-    zombieEnemy &&
+    zombie &&
     characterMoving &&
     rectangularCollision({
       rectangle1: {
@@ -433,9 +458,9 @@ function updateHealth() {
         height: characterMoving.spriteCuts.dh - 10,
       },
       rectangle2: {
-        position: zombieEnemy.position,
-        width: zombieEnemy.spriteCuts.dw - 20,
-        height: zombieEnemy.spriteCuts.dh - 10,
+        position: zombie.position,
+        width: zombie.spriteCuts.dw - 20,
+        height: zombie.spriteCuts.dh - 10,
       },
     })
   ) {
@@ -639,19 +664,6 @@ async function loadAssetsAndStartGame() {
       animationSpeed: 25,
     });
 
-    zombieEnemy = new Sprite({
-      position: { x: 500, y: 300 },
-      image: zombieWalk,
-      spriteCuts: {
-        sw: zombieWalk.width / 11,
-        sh: zombieWalk.height / 4,
-        dw: zombieWalk.width / 11,
-        dh: zombieWalk.height / 4,
-      },
-      totalFrames: { x: 11, y: 4 },
-      animationSpeed: 25,
-    });
-
     characterShooting = new Sprite({
       position: { x: 0, y: 0 },
       image: playerShoot,
@@ -665,6 +677,7 @@ async function loadAssetsAndStartGame() {
       animationSpeed: 25,
     });
 
+    zombieImage = zombieWalk;
     bullet = bulletImage; // saves bulletImage to the global scope bullet variable to be used in creating new bullets
 
     animate(); // Start the animation loop
