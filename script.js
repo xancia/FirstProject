@@ -48,14 +48,17 @@ let characterMoving,
   zombieEnemy,
   background,
   characterShooting,
-  bulletSprite,
-  bulletDirection;
+  bulletDirection,
+  bullet,
+  bulletFacingDirection;
 let playerHealth = 100;
 let currentPlayerPosition = { x: 0, y: 0 };
+let bullets = [];
 let bulletLeft = 0;
 let bulletRight = 0;
 let bulletUp = 0;
 let bulletDown = 0;
+// let bulletFired = false;
 let isPlayerShooting = false;
 const maxPlayerHealth = 100;
 let lastHealthDropTime = Date.now();
@@ -84,6 +87,7 @@ class Sprite {
     spriteCuts,
     totalFrames,
     animationSpeed = 25,
+    velocity
   }) {
     this.position = position;
     this.image = image;
@@ -96,6 +100,7 @@ class Sprite {
       animationSpeed,
     };
     this.moving = false;
+    this.velocity = velocity;
   }
 
   drawBackground() {
@@ -161,11 +166,17 @@ class Sprite {
       this.spriteCuts.valy * 32, // Y position for sprite sheet
       this.image.width / this.spriteCuts.totalFrames.x, // Single frame width
       this.image.height / this.spriteCuts.totalFrames.y, // Single frame height
-      this.position.x + currentPlayerPosition.x,
-      this.position.y + currentPlayerPosition.y,
+      this.position.x,
+      this.position.y,
       this.spriteCuts.dw,
       this.spriteCuts.dh
     );
+  }
+
+  updateBullet() {
+    this.drawBullet();
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y
 
     if (this.moving) {
       this.spriteCuts.elapsed++;
@@ -283,16 +294,16 @@ function animate() {
   boundaries.forEach((boundary) => boundary.draw());
 
   // Handle player movement based on key presses
-  if (keys.a.pressed && lastKey === "a") {
+  if (keys.a.pressed && lastKey === "a" && characterMoving.moving) {
     movePlayer(-1, 0);
   }
-  if (keys.d.pressed && lastKey === "d") {
+  if (keys.d.pressed && lastKey === "d" && characterMoving.moving) {
     movePlayer(1, 0);
   }
-  if (keys.w.pressed && lastKey === "w") {
+  if (keys.w.pressed && lastKey === "w" && characterMoving.moving) {
     movePlayer(0, -1);
   }
-  if (keys.s.pressed && lastKey === "s") {
+  if (keys.s.pressed && lastKey === "s" && characterMoving.moving) {
     movePlayer(0, 1);
   }
 
@@ -310,10 +321,13 @@ function shootGun() {
     characterShooting.position.y = currentPlayerPosition.y;
     characterShooting.drawCharacterShooting();
     characterShooting.moving = true;
+    
   }
   if (characterShooting.spriteCuts.elapsed < 75) {
     window.removeEventListener("keydown", keyDownFunction);
     window.removeEventListener("keyup", keyUpFunction);
+    characterMoving.moving = false;
+    
   } else {
     window.addEventListener("keydown", keyDownFunction);
     window.addEventListener("keyup", keyUpFunction);
@@ -324,12 +338,49 @@ function shootGun() {
 
 // Draws the bullet and make it fly in the direction of the last key pressed
 function fireBullet() {
-  if (bulletSprite && keys.enter.pressed) {
-    bulletSprite.drawBullet();
-    bulletSprite.moving = true;
-    bulletSprite.position.x += bulletLeft + bulletRight;
-    bulletSprite.position.y += bulletUp + bulletDown;
+  if (keys.enter.pressed) {
+    bullets.forEach((bullet, index) => {
+      bullet.updateBullet(); // Update position and draw
+      if (lastKey === "a") {
+        bullet.spriteCuts.valy = 3;
+      } else if (lastKey === "w") {
+        bullet.spriteCuts.valy = 0;
+      } else if (lastKey === "s") {
+        bullet.spriteCuts.valy = 1;
+      } else if (lastKey === "d") {
+        bullet.spriteCuts.valy = 2; 
+      }
+    
+      bullet.moving = true;
+      // Check for offscreen bullets to remove
+      if (bulletIsOffscreen(bullet)) {
+        bullets.splice(index, 1);
+      }
+    });
   }
+  
+}
+
+function bulletIsOffscreen(bullet) {
+  return (
+    bullet.position.x + bullet.spriteCuts.dw < 0 ||
+    bullet.position.x > canvas.width ||
+    bullet.position.y + bullet.spriteCuts.dh < 0 ||
+    bullet.position.y > canvas.height 
+    ||
+    rectangularCollision({
+      rectangle1: {
+        position: bullet.position,
+        width: bullet.spriteCuts.dw - 30,
+        height: bullet.spriteCuts.dh - 25,
+      },
+      rectangle2: {
+        position: zombieEnemy.position,
+        width: zombieEnemy.spriteCuts.dw - 30,
+        height: zombieEnemy.spriteCuts.dh - 15,
+      },
+    })
+  );
 }
 
 function drawHealthBar() {
@@ -453,37 +504,44 @@ function keyDownFunction(event) {
       }
       break;
 
-    // Handles data for when enter is pressed for firing animation and bullet placement
+    // Handles data for when enter is pressed for firing animation
     case "Enter":
+      let speed = 2; // Bullet speed
+      let velocity;
+
+      
       if (lastKey === "a") {
         characterShooting.spriteCuts.valy = 3;
-        bulletSprite.spriteCuts.valy = 3;
-        bulletLeft = -1;
-        bulletRight = 0;
-        bulletDown = 0;
-        bulletUp = 0;
+        velocity = { x: -speed, y: 0 };
       } else if (lastKey === "w") {
         characterShooting.spriteCuts.valy = 1;
-        bulletSprite.spriteCuts.valy = 0;
-        bulletUp = -1;
-        bulletDown = 0;
-        bulletRight = 0;
-        bulletLeft = 0;
+        velocity = { x: 0, y: -speed };
       } else if (lastKey === "s") {
         characterShooting.spriteCuts.valy = 0;
-        bulletSprite.spriteCuts.valy = 1;
-        bulletDown = 1;
-        bulletUp = 0;
-        bulletRight = 0;
-        bulletLeft = 0;
+        velocity = { x: 0, y: speed };
       } else if (lastKey === "d") {
         characterShooting.spriteCuts.valy = 2;
-        bulletSprite.spriteCuts.valy = 2;
-        bulletRight = 1;
-        bulletLeft = 0;
-        bulletDown = 0;
-        bulletUp = 0;
+        velocity = { x: speed, y: 0 };
       }
+
+      if(velocity) {
+      const bulletSprite = new Sprite({
+        position: { x: characterMoving.position.x - 10, y: characterMoving.position.y - 3 },
+        image: bullet,
+        spriteCuts: {
+          sw: bullet.width / 5,
+          sh: bullet.height / 4,
+          dw: bullet.width / 3,
+          dh: bullet.height / 3,
+        },
+        totalFrames: { x: 5, y: 4 },
+        animationSpeed: 25,
+        velocity: velocity
+      });
+      bullets.push(bulletSprite)
+      // keys.enter.pressed = false; // prevent continuous firing
+    }
+
       currentPlayerPosition.x = characterMoving.position.x;
       currentPlayerPosition.y = characterMoving.position.y;
       keys.enter.pressed = true;
@@ -516,7 +574,7 @@ function keyUpFunction(event) {
       break;
 
     // case "Enter":
-    //   keys.enter.pressed = false;
+    //   bulletFired = false;
     //   break;
   }
   // If none of the movement keys are pressed, set moving to false
@@ -528,9 +586,6 @@ function keyUpFunction(event) {
   ) {
     characterMoving.moving = false;
   }
-
-  if (!keys.enter.pressed) {
-  }
 }
 
 // ----- Event Listeners -----
@@ -541,7 +596,7 @@ window.addEventListener("keyup", keyUpFunction);
 // ----- Asset Loading and Game Initialization -----
 async function loadAssetsAndStartGame() {
   try {
-    const [newMap, playerWalk, zombieWalk, playerShoot, bullet] =
+    const [newMap, playerWalk, zombieWalk, playerShoot, bulletImage] =
       await Promise.all([
         loadImage("./assets/Tile Set/newMap.png"),
         loadImage("./assets/Apocalypse Character Pack/Player/Walk.png"),
@@ -600,18 +655,7 @@ async function loadAssetsAndStartGame() {
       animationSpeed: 25,
     });
 
-    bulletSprite = new Sprite({
-      position: { x: 0, y: 0 },
-      image: bullet,
-      spriteCuts: {
-        sw: bullet.width / 5,
-        sh: bullet.height / 4,
-        dw: bullet.width / 5,
-        dh: bullet.height / 4,
-      },
-      totalFrames: { x: 5, y: 4 },
-      animationSpeed: 25,
-    });
+    bullet = bulletImage
 
     animate(); // Start the animation loop
   } catch (error) {
