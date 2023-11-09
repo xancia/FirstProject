@@ -41,12 +41,17 @@ const keys = {
   s: { pressed: false },
   d: { pressed: false },
   escape: { pressed: false },
-  enter: { pressed: false }
+  enter: { pressed: false },
 };
 let lastKey = "";
-let characterMoving, zombieEnemy, background, characterShooting, bulletSprite, bulletDirection;
+let characterMoving,
+  zombieEnemy,
+  background,
+  characterShooting,
+  bulletSprite,
+  bulletDirection;
 let playerHealth = 100;
-let currentPlayerPosition = {x: 0, y: 0}
+let currentPlayerPosition = { x: 0, y: 0 };
 let bulletLeft = 0;
 let bulletRight = 0;
 let bulletUp = 0;
@@ -185,9 +190,11 @@ const boundaries = [];
 collisionsMap.forEach((row, i) => {
   row.forEach((cell, j) => {
     if (cell === 257) {
-      boundaries.push(new Boundary({
-        position: { x: j * Boundary.width, y: i * Boundary.height },
-      }));
+      boundaries.push(
+        new Boundary({
+          position: { x: j * Boundary.width, y: i * Boundary.height },
+        })
+      );
     }
   });
 });
@@ -262,7 +269,7 @@ function animate() {
   background.drawBackground();
 
   if (characterMoving && !isPlayerShooting) {
-      characterMoving.drawCharacter()
+    characterMoving.drawCharacter();
   }
 
   if (zombieEnemy) {
@@ -291,17 +298,17 @@ function animate() {
 
   // Shoot projectile in the faced direction when enter is pressed
   if (keys.enter.pressed) {
-  shootGun()
-} 
-fireBullet()
-
+    shootGun();
+  }
+  fireBullet();
 }
 
+// Draws shooting animation at player position and removes event listeners so player stays in place until finished
 function shootGun() {
   if (characterShooting && isPlayerShooting) {
-    characterShooting.position.x = currentPlayerPosition.x
-    characterShooting.position.y = currentPlayerPosition.y
-    characterShooting.drawCharacterShooting()
+    characterShooting.position.x = currentPlayerPosition.x;
+    characterShooting.position.y = currentPlayerPosition.y;
+    characterShooting.drawCharacterShooting();
     characterShooting.moving = true;
   }
   if (characterShooting.spriteCuts.elapsed < 75) {
@@ -309,12 +316,13 @@ function shootGun() {
     window.removeEventListener("keyup", keyUpFunction);
   } else {
     window.addEventListener("keydown", keyDownFunction);
-  window.addEventListener("keyup", keyUpFunction);
+    window.addEventListener("keyup", keyUpFunction);
     isPlayerShooting = false;
     characterShooting.moving = false;
   }
 }
 
+// Draws the bullet and make it fly in the direction of the last key pressed
 function fireBullet() {
   if (bulletSprite && keys.enter.pressed) {
     bulletSprite.drawBullet();
@@ -445,6 +453,7 @@ function keyDownFunction(event) {
       }
       break;
 
+    // Handles data for when enter is pressed for firing animation and bullet placement
     case "Enter":
       if (lastKey === "a") {
         characterShooting.spriteCuts.valy = 3;
@@ -464,7 +473,7 @@ function keyDownFunction(event) {
         characterShooting.spriteCuts.valy = 0;
         bulletSprite.spriteCuts.valy = 1;
         bulletDown = 1;
-        bulletUp = 0
+        bulletUp = 0;
         bulletRight = 0;
         bulletLeft = 0;
       } else if (lastKey === "d") {
@@ -476,7 +485,7 @@ function keyDownFunction(event) {
         bulletUp = 0;
       }
       currentPlayerPosition.x = characterMoving.position.x;
-      currentPlayerPosition.y = characterMoving.position.y
+      currentPlayerPosition.y = characterMoving.position.y;
       keys.enter.pressed = true;
       isPlayerShooting = true;
       break;
@@ -515,15 +524,13 @@ function keyUpFunction(event) {
     !keys.w.pressed &&
     !keys.a.pressed &&
     !keys.s.pressed &&
-    !keys.d.pressed 
+    !keys.d.pressed
   ) {
     characterMoving.moving = false;
   }
 
   if (!keys.enter.pressed) {
-    
   }
-
 }
 
 // ----- Event Listeners -----
@@ -534,13 +541,14 @@ window.addEventListener("keyup", keyUpFunction);
 // ----- Asset Loading and Game Initialization -----
 async function loadAssetsAndStartGame() {
   try {
-    const [newMap, playerWalk, zombieWalk, playerShoot, bullet] = await Promise.all([
-      loadImage("./assets/Tile Set/newMap.png"),
-      loadImage("./assets/Apocalypse Character Pack/Player/Walk.png"),
-      loadImage("./assets/Apocalypse Character Pack/Zombie/Walk.png"),
-      loadImage("./assets/Apocalypse Character Pack/Player/Shoot.png"),
-      loadImage("./assets/Apocalypse Character Pack/Player/Bullet.png"),
-    ]);
+    const [newMap, playerWalk, zombieWalk, playerShoot, bullet] =
+      await Promise.all([
+        loadImage("./assets/Tile Set/newMap.png"),
+        loadImage("./assets/Apocalypse Character Pack/Player/Walk.png"),
+        loadImage("./assets/Apocalypse Character Pack/Zombie/Walk.png"),
+        loadImage("./assets/Apocalypse Character Pack/Player/Shoot.png"),
+        loadImage("./assets/Apocalypse Character Pack/Player/Bullet.png"),
+      ]);
 
     background = new Sprite({
       position: { x: 0, y: 0 },
