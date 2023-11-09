@@ -31,7 +31,7 @@ function checkCollision(nextPos) {
 
 // Utility to get random number
 function getRandomNumber(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 // Function to create a zombie and push it into the zombies[] array
@@ -68,8 +68,6 @@ function createZombie() {
   zombieEnemy.health = 100;
   zombies.push(zombieEnemy);
 }
-
-setInterval(createZombie, 3000); // using set interval to create a zombie every x * 1000 seconds
 
 // Function to draw a game over screen, used when player dies
 function drawGameOverScreen() {
@@ -133,7 +131,7 @@ function restartGame() {
   killCount.textContent = "Current Kill Count: 0";
   canvas.removeEventListener("click", tryAgain);
   gameOver = false;
-  requestAnimationFrame(animate);
+  startAnimation();
 }
 
 // ----- Global Variables -----
@@ -176,6 +174,7 @@ let lastHealthDropTime = Date.now();
 let zombiesKilled = 0;
 let currentHighScore = 0;
 let gameOver = false;
+let zombieGenerationSpeed = 3000;
 
 // These constants are for the try again button
 const buttonWidth = 150;
@@ -381,7 +380,7 @@ function attackPlayer(zombie) {
   const dx = characterMoving.position.x - zombie.position.x;
   const dy = characterMoving.position.y - zombie.position.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
-  const speed = 0.2; // Adjust speed of zombie
+  const speed = Math.random() * (0.4 - 0.15) + 0.15; // Adjust speed of zombie
 
   // Only move the zombie if it's not too close to the player
   if (distance > 10) {
@@ -631,6 +630,7 @@ function startAnimation() {
 function stopAnimation() {
   if (animationFrameId) {
     cancelAnimationFrame(animationFrameId); // Stop the animation loop
+    clearInterval(createZombie);
     animationFrameId = null; // Reset the loop check
   }
 }
@@ -827,3 +827,5 @@ async function loadAssetsAndStartGame() {
 }
 
 loadAssetsAndStartGame(); // Call the function to load assets and start the game
+
+setInterval(createZombie, zombieGenerationSpeed); // using set interval to create a zombie every x * 1000 seconds
