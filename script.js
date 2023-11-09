@@ -29,10 +29,30 @@ function checkCollision(nextPos) {
   );
 }
 
+// Utility to get random number
+function getRandomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
+
 // Function to create a zombie and push it into the zombies[] array
 function createZombie() {
+  let zombieSpawnGenerator = getRandomNumber(1,4)
+  let zombieSpawnLeftSide = {x: 0, y: getRandomNumber(0, 720)}
+  let zombieSpawnRightSide = {x: 1280, y: getRandomNumber(0, 720)}
+  let zombieSpawnTopSide = {x: getRandomNumber(0, 1280), y: 0}
+  let zombieSpawnBottomSide = {x: getRandomNumber(0, 1280), y: 720}
+  let zombieSpawnSpots = {}
+  if (zombieSpawnGenerator == 1) {
+    zombieSpawnSpots = zombieSpawnLeftSide
+  } else if (zombieSpawnGenerator == 2) {
+    zombieSpawnSpots = zombieSpawnRightSide
+  } else if (zombieSpawnGenerator == 3) {
+    zombieSpawnSpots = zombieSpawnTopSide
+  } else if (zombieSpawnGenerator == 4) {
+    zombieSpawnSpots = zombieSpawnBottomSide
+  }
   let zombieEnemy = new Sprite({
-    position: { x: 500, y: 300 },
+    position: zombieSpawnSpots,
     image: zombieImage,
     spriteCuts: {
       sw: zombieImage.width / 11,
