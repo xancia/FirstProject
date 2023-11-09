@@ -20,6 +20,7 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
 }
 
 function checkCollision(nextPos) {
+  //boundaries.some() method is used to check every single boundary in the game and compare it to the nextpos used for the character collision check, if every rectangularcollision check returns false, then .some will return false
   return boundaries.some((boundary) =>
     rectangularCollision({
       rectangle1: nextPos,
