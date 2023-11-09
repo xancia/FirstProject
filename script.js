@@ -49,13 +49,78 @@ function createZombie() {
 
 setInterval(createZombie, 5000); // using set interval to create a zombie every x * 1000 seconds
 
+// Function to draw a game over screen, used when player dies
+function drawGameOverScreen() {
+  // Dim the background
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)"; // semi-transparent black
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw the game over box
+  const boxWidth = 400;
+  const boxHeight = 200;
+  const boxX = canvas.width / 2 - boxWidth / 2;
+  const boxY = canvas.height / 2 - boxHeight / 2;
+  ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; // semi-transparent white
+  ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+
+  // Draw the game over text
+  ctx.fillStyle = "#000"; 
+  ctx.font = "30px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 50);
+
+  // Draw the try again button
+  ctx.fillStyle = "#000"; 
+  ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+
+  // Draw the try again button text
+  ctx.fillStyle = "#FFF"; 
+  ctx.font = "20px Arial";
+  ctx.fillText("Try Again", canvas.width / 2, canvas.height / 2 + 50);
+
+  // Adds event listener
+  canvas.addEventListener("click", tryAgain);
+}
+
+// Function for the Try Again Event listener
+function tryAgain(event) {
+  // Calculate the mouse click coordinates relative to the canvas
+  const clickX = event.clientX - canvas.getBoundingClientRect().left;
+  const clickY = event.clientY - canvas.getBoundingClientRect().top;
+
+  // Check if the click was within the button's bounding box
+  if (
+    clickX >= buttonX &&
+    clickX <= buttonX + buttonWidth &&
+    clickY >= buttonY &&
+    clickY <= buttonY + buttonHeight
+  ) {
+    restartGame();
+  }
+}
+
+// Function to reset values and set gameOver to false
+function restartGame() {
+  zombies = []
+  bullets = []
+  playerHealth = 100;
+  zombiesKilled = 0;
+  currentPlayerPosition = { x: 0, y: 0 };
+  characterMoving.position.x = canvas.width / 2;
+  characterMoving.position.y = canvas.height / 3;
+  killCount.textContent = 'Current Kill Count: 0'
+  canvas.removeEventListener("click", tryAgain);
+  gameOver = false;
+  requestAnimationFrame(animate)
+}
+
 // ----- Global Variables -----
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = 1280;
 canvas.height = 720;
-const killCount = document.querySelector(".kill-count")
-const highScore = document.querySelector(".high-score")
+const killCount = document.querySelector(".kill-count");
+const highScore = document.querySelector(".high-score");
 
 const COLLISION_PADDING = { top: 15, bottom: 5, left: 15, right: 15 };
 const keys = {
@@ -88,6 +153,13 @@ const maxPlayerHealth = 100;
 let lastHealthDropTime = Date.now();
 let zombiesKilled = 0;
 let currentHighScore = 0;
+let gameOver = false;
+
+// These constants are for the try again button
+const buttonWidth = 150;
+const buttonHeight = 50;
+const buttonX = canvas.width / 2 - buttonWidth / 2;
+const buttonY = canvas.height / 2 + 20;
 
 // ----- Classes -----
 class Boundary {
@@ -340,6 +412,10 @@ function animate() {
     shootGun();
     fireBullet();
   }
+
+  if (gameOver) {
+    drawGameOverScreen();
+  }
 }
 
 // Draws shooting animation at player position and removes event listeners and set moving to false so player stays in place until finished
@@ -388,9 +464,9 @@ function fireBullet() {
     zombies.forEach((zombie, zIndex) => {
       if (bulletHitZombie(bullet, zombie)) {
         bullets.splice(index, 1);
-        updateZombieHealth(zombie,bullet,zIndex)
+        updateZombieHealth(zombie, bullet, zIndex);
       }
-    })
+    });
   });
 }
 
@@ -482,16 +558,16 @@ function updateHealth(zombie) {
 
   // If health is 0, handle the player's death (game over, etc.)
   if (playerHealth <= 0) {
-    if(zombiesKilled > currentHighScore) {
-    currentHighScore = zombiesKilled
+    if (zombiesKilled > currentHighScore) {
+      currentHighScore = zombiesKilled;
     }
-    highScore.textContent = `HighScore: ${currentHighScore}`
+    highScore.textContent = `HighScore: ${currentHighScore}`;
+    gameOver = true;
     stopAnimation();
   }
 }
 
 function updateZombieHealth(zombie, bullet, index) {
-
   // Check if a zombie is touching a bullet
   if (
     zombie &&
@@ -509,14 +585,14 @@ function updateZombieHealth(zombie, bullet, index) {
       },
     })
   ) {
-      zombie.health -= 20; // Determines how much damage the zombie takes
+    zombie.health -= 20; // Determines how much damage the zombie takes
   }
 
   // If health is 0, handle the zombie death (killCount, despawn, etc.)
   if (zombie.health <= 0) {
-    zombies.splice(index, 1)
-    zombiesKilled++
-    killCount.textContent = `Current Kill Count: ${zombiesKilled}`
+    zombies.splice(index, 1);
+    zombiesKilled++;
+    killCount.textContent = `Current Kill Count: ${zombiesKilled}`;
   }
 }
 
