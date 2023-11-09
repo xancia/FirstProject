@@ -40,11 +40,18 @@ const keys = {
   a: { pressed: false },
   s: { pressed: false },
   d: { pressed: false },
-  Escape: { pressed: false },
+  escape: { pressed: false },
+  enter: { pressed: false }
 };
 let lastKey = "";
-let characterMoving, zombieEnemy, background;
+let characterMoving, zombieEnemy, background, characterShooting, bulletSprite, bulletDirection;
 let playerHealth = 100;
+let currentPlayerPosition = {x: 0, y: 0}
+let bulletLeft = 0;
+let bulletRight = 0;
+let bulletUp = 0;
+let bulletDown = 0;
+let isPlayerShooting = false;
 const maxPlayerHealth = 100;
 let lastHealthDropTime = Date.now();
 
@@ -111,7 +118,59 @@ class Sprite {
       }
     } else {
       // If the character is not moving, you might want to reset to a specific frame
+      this.spriteCuts.val = 1; // Reset to the first frame or an idle frame
+      this.spriteCuts.elapsed = 0; // Reset counter
+    }
+  }
+
+  drawCharacterShooting() {
+    ctx.drawImage(
+      this.image,
+      this.spriteCuts.val * 32, // X position for sprite sheet
+      this.spriteCuts.valy * 32, // Y position for sprite sheet
+      this.image.width / this.spriteCuts.totalFrames.x, // Single frame width
+      this.image.height / this.spriteCuts.totalFrames.y, // Single frame height
+      this.position.x,
+      this.position.y,
+      this.spriteCuts.dw,
+      this.spriteCuts.dh
+    );
+
+    if (this.moving) {
+      this.spriteCuts.elapsed++;
+      if (this.spriteCuts.elapsed % this.spriteCuts.animationSpeed === 0) {
+        this.spriteCuts.val =
+          (this.spriteCuts.val + 1) % (this.spriteCuts.totalFrames.x - 1); // Looping through the horizontal frames minus 1
+      }
+    } else {
+      // If the character is not moving, you might want to reset to a specific frame
       this.spriteCuts.val = 0; // Reset to the first frame or an idle frame
+      this.spriteCuts.elapsed = 0; // Reset counter
+    }
+  }
+
+  drawBullet() {
+    ctx.drawImage(
+      this.image,
+      this.spriteCuts.val * 32, // X position for sprite sheet
+      this.spriteCuts.valy * 32, // Y position for sprite sheet
+      this.image.width / this.spriteCuts.totalFrames.x, // Single frame width
+      this.image.height / this.spriteCuts.totalFrames.y, // Single frame height
+      this.position.x + currentPlayerPosition.x,
+      this.position.y + currentPlayerPosition.y,
+      this.spriteCuts.dw,
+      this.spriteCuts.dh
+    );
+
+    if (this.moving) {
+      this.spriteCuts.elapsed++;
+      if (this.spriteCuts.elapsed % this.spriteCuts.animationSpeed === 0) {
+        this.spriteCuts.val =
+          (this.spriteCuts.val + 1) % (this.spriteCuts.totalFrames.x - 1); // Looping through the horizontal frames minus 1
+      }
+    } else {
+      this.spriteCuts.val = 0; // reset frame
+      this.spriteCuts.elapsed = 0; // Reset counter
     }
   }
 }
@@ -184,7 +243,7 @@ function attackPlayer() {
   const dx = characterMoving.position.x - zombieEnemy.position.x;
   const dy = characterMoving.position.y - zombieEnemy.position.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
-  const speed = 0.2; // Adjust speed as necessary
+  const speed = 0.2; // Adjust speed of zombie
 
   // Only move the zombie if it's not too close to the player
   if (distance > Boundary.width / 2) {
@@ -202,8 +261,8 @@ function animate() {
 
   background.drawBackground();
 
-  if (characterMoving) {
-    characterMoving.drawCharacter();
+  if (characterMoving && !isPlayerShooting) {
+      characterMoving.drawCharacter()
   }
 
   if (zombieEnemy) {
@@ -228,6 +287,24 @@ function animate() {
   }
   if (keys.s.pressed && lastKey === "s") {
     movePlayer(0, 1);
+  }
+
+  // Shoot projectile in the faced direction when enter is pressed
+  fireBullet()
+}
+
+function shootGun() {
+  if (characterShooting && isPlayerShooting) {
+
+  }
+}
+
+function fireBullet() {
+  if (bulletSprite && keys.enter.pressed) {
+    bulletSprite.drawBullet();
+    bulletSprite.moving = true;
+    bulletSprite.position.x += bulletLeft + bulletRight;
+    bulletSprite.position.y += bulletUp + bulletDown;
   }
 }
 
@@ -345,12 +422,17 @@ window.addEventListener("keydown", (event) => {
       break;
 
     case "Escape":
-      keys.Escape.pressed = true;
+      keys.escape.pressed = true;
       if (animationFrameId) {
         stopAnimation();
       } else {
         startAnimation();
       }
+      break;
+
+    case "Enter":
+      keys.enter.pressed = true;
+      isPlayerShooting = true;
       break;
   }
 });
@@ -375,29 +457,68 @@ window.addEventListener("keyup", (event) => {
       break;
 
     case "Escape":
-      keys.esc.pressed = false;
+      keys.escape.pressed = false;
       break;
+
+    // case "Enter":
+    //   keys.enter.pressed = false;
+    //   break;
   }
   // If none of the movement keys are pressed, set moving to false
   if (
     !keys.w.pressed &&
     !keys.a.pressed &&
     !keys.s.pressed &&
-    !keys.d.pressed
+    !keys.d.pressed 
   ) {
     characterMoving.moving = false;
-    characterMoving.spriteCuts.elapsed = 0;
-    characterMoving.spriteCuts.val = 1;
   }
+
+  if (!keys.enter.pressed) {
+    if (lastKey === "a") {
+      characterShooting.spriteCuts.valy = 3;
+      bulletSprite.spriteCuts.valy = 3;
+      bulletLeft = -1;
+      bulletRight = 0;
+      bulletDown = 0;
+      bulletUp = 0;
+    } else if (lastKey === "w") {
+      characterShooting.spriteCuts.valy = 1;
+      bulletSprite.spriteCuts.valy = 0;
+      bulletUp = -1;
+      bulletDown = 0;
+      bulletRight = 0;
+      bulletLeft = 0;
+    } else if (lastKey === "s") {
+      characterShooting.spriteCuts.valy = 0;
+      bulletSprite.spriteCuts.valy = 1;
+      bulletDown = 1;
+      bulletUp = 0
+      bulletRight = 0;
+      bulletLeft = 0;
+    } else if (lastKey === "d") {
+      characterShooting.spriteCuts.valy = 2;
+      bulletSprite.spriteCuts.valy = 2;
+      bulletRight = 1;
+      bulletLeft = 0;
+      bulletDown = 0;
+      bulletUp = 0;
+    }
+    currentPlayerPosition.x = characterMoving.position.x;
+    currentPlayerPosition.y = characterMoving.position.y
+  }
+
 });
 
 // ----- Asset Loading and Game Initialization -----
 async function loadAssetsAndStartGame() {
   try {
-    const [newMap, playerWalk, zombieWalk] = await Promise.all([
+    const [newMap, playerWalk, zombieWalk, playerShoot, bullet] = await Promise.all([
       loadImage("./assets/Tile Set/newMap.png"),
       loadImage("./assets/Apocalypse Character Pack/Player/Walk.png"),
       loadImage("./assets/Apocalypse Character Pack/Zombie/Walk.png"),
+      loadImage("./assets/Apocalypse Character Pack/Player/Shoot.png"),
+      loadImage("./assets/Apocalypse Character Pack/Player/Bullet.png"),
     ]);
 
     background = new Sprite({
@@ -434,6 +555,32 @@ async function loadAssetsAndStartGame() {
         dh: zombieWalk.height / 4,
       },
       totalFrames: { x: 11, y: 4 },
+      animationSpeed: 25,
+    });
+
+    characterShooting = new Sprite({
+      position: { x: 0, y: 0 },
+      image: playerShoot,
+      spriteCuts: {
+        sw: playerShoot.width / 5,
+        sh: playerShoot.height / 4,
+        dw: playerShoot.width / 5,
+        dh: playerShoot.height / 4,
+      },
+      totalFrames: { x: 5, y: 4 },
+      animationSpeed: 25,
+    });
+
+    bulletSprite = new Sprite({
+      position: { x: 0, y: 0 },
+      image: bullet,
+      spriteCuts: {
+        sw: bullet.width / 5,
+        sh: bullet.height / 4,
+        dw: bullet.width / 5,
+        dh: bullet.height / 4,
+      },
+      totalFrames: { x: 5, y: 4 },
       animationSpeed: 25,
     });
 
