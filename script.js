@@ -36,7 +36,9 @@ function getRandomNumber(min, max) {
 
 // Function to create a zombie and push it into the zombies[] array
 function createZombie() {
-  let zombieSpawnGenerator = getRandomNumber(1, 4);
+  let zombieSpawnGenerator = getRandomNumber(1, 4); // Generate a number to use for spawnspots
+
+  // These only generate a number that would be at the edge of the screen still
   let zombieSpawnLeftSide = { x: 0, y: getRandomNumber(0, 720) };
   let zombieSpawnRightSide = { x: 1280, y: getRandomNumber(0, 720) };
   let zombieSpawnTopSide = { x: getRandomNumber(0, 1280), y: 0 };
@@ -545,6 +547,7 @@ function drawHealthBar() {
   ctx.strokeRect(x, y, healthBarWidth, healthBarHeight);
 }
 
+// Function used for zombie to attack the player
 function updateHealth(zombie) {
   // Get the current time
   const now = Date.now();
@@ -587,6 +590,7 @@ function updateHealth(zombie) {
   }
 }
 
+// Function to update zombie health when it gets hit by a bullet
 function updateZombieHealth(zombie, bullet, index) {
   // Check if a zombie is touching a bullet
   if (
@@ -626,7 +630,7 @@ function startAnimation() {
 function stopAnimation() {
   if (animationFrameId) {
     cancelAnimationFrame(animationFrameId); // Stop the animation loop
-    animationFrameId = null; // Reset the identifier
+    animationFrameId = null; // Reset the loop check
   }
 }
 
