@@ -20,7 +20,11 @@ canvas {
   background: #000;
 }
 
-.instructions {
+.bottom-area {
+  display: flex;
+}
+
+.box {
   width: 284px;
   display: flex;
   justify-content: center;

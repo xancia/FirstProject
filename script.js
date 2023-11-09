@@ -54,6 +54,8 @@ const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = 1280;
 canvas.height = 720;
+const killCount = document.querySelector(".kill-count")
+const highScore = document.querySelector(".high-score")
 
 const COLLISION_PADDING = { top: 15, bottom: 5, left: 15, right: 15 };
 const keys = {
@@ -84,6 +86,8 @@ let bulletDown = 0;
 let isPlayerShooting = false;
 const maxPlayerHealth = 100;
 let lastHealthDropTime = Date.now();
+let zombiesKilled = 0;
+let currentHighScore = 0;
 
 // ----- Classes -----
 class Boundary {
@@ -478,7 +482,10 @@ function updateHealth(zombie) {
 
   // If health is 0, handle the player's death (game over, etc.)
   if (playerHealth <= 0) {
-    console.log("Player is dead!");
+    if(zombiesKilled > currentHighScore) {
+    currentHighScore = zombiesKilled
+    }
+    highScore.textContent = `HighScore: ${currentHighScore}`
     stopAnimation();
   }
 }
@@ -502,12 +509,14 @@ function updateZombieHealth(zombie, bullet, index) {
       },
     })
   ) {
-      zombie.health -= 10; // Decrease health by 10
+      zombie.health -= 20; // Determines how much damage the zombie takes
   }
 
-  // If health is 0, handle the player's death (game over, etc.)
+  // If health is 0, handle the zombie death (killCount, despawn, etc.)
   if (zombie.health <= 0) {
     zombies.splice(index, 1)
+    zombiesKilled++
+    killCount.textContent = `Current Kill Count: ${zombiesKilled}`
   }
 }
 
