@@ -310,8 +310,9 @@ function animate() {
   // Shoot projectile in the faced direction when enter is pressed
   if (keys.enter.pressed) {
     shootGun();
+    fireBullet();
   }
-  fireBullet();
+  
 }
 
 // Draws shooting animation at player position and removes event listeners and set moving to false so player stays in place until finished
@@ -338,7 +339,6 @@ function shootGun() {
 
 // Draws the bullet and make it fly in the direction of the last key pressed
 function fireBullet() {
-  if (keys.enter.pressed) {
     bullets.forEach((bullet, index) => {
       bullet.updateBullet(); // Update position and draw
 
@@ -363,8 +363,6 @@ function fireBullet() {
         bullets.splice(index, 1);
       }
     });
-  }
-  
 }
 
 // Checks if bullet is going off the map
