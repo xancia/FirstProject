@@ -341,7 +341,7 @@ function shootGun() {
 // Draws the bullet and make it fly in the direction of the last key pressed
 function fireBullet() {
     bullets.forEach((bullet, index) => {
-      bullet.updateBullet(); // Update position and draw
+      bullet.updateBullet(); // Update position and draw for each bullet in the bullets[] array, we use for each so we can access the index value to remove it when it leaves the screen or hits a zombie
 
       //sets the right sprite animation - currently semi-broken
       if (lastKey === "a") {
