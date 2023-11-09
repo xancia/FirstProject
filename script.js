@@ -1,5 +1,5 @@
 // ----- Utility Functions -----
-// A function to load an image and return a promise
+// A function to load an image and return a promise fullfilled or error if it didn't load
 function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -9,7 +9,7 @@ function loadImage(src) {
   });
 }
 
-// A function to check for rectangular collisions
+// A function to check for rectangular collisions between 2 objects
 function rectangularCollision({ rectangle1, rectangle2 }) {
   return (
     rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
@@ -19,8 +19,8 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
   );
 }
 
+// boundaries.some() method is used to check every single boundary in the game and compare it to the nextpos used for the character collision check, if every rectangularcollision check returns false, then .some will return false
 function checkCollision(nextPos) {
-  //boundaries.some() method is used to check every single boundary in the game and compare it to the nextpos used for the character collision check, if every rectangularcollision check returns false, then .some will return false
   return boundaries.some((boundary) =>
     rectangularCollision({
       rectangle1: nextPos,
@@ -59,7 +59,6 @@ let bulletLeft = 0;
 let bulletRight = 0;
 let bulletUp = 0;
 let bulletDown = 0;
-// let bulletFired = false;
 let isPlayerShooting = false;
 const maxPlayerHealth = 100;
 let lastHealthDropTime = Date.now();
@@ -88,7 +87,7 @@ class Sprite {
     spriteCuts,
     totalFrames,
     animationSpeed = 25,
-    velocity
+    velocity,
   }) {
     this.position = position;
     this.image = image;
@@ -115,10 +114,10 @@ class Sprite {
       this.spriteCuts.valy * 32, // Y position for sprite sheet
       this.image.width / this.spriteCuts.totalFrames.x, // Single frame width
       this.image.height / this.spriteCuts.totalFrames.y, // Single frame height
-      this.position.x,
-      this.position.y,
-      this.spriteCuts.dw,
-      this.spriteCuts.dh
+      this.position.x, // Starting X position
+      this.position.y, // Starting Y Position
+      this.spriteCuts.dw, // Sprite size on X Scale
+      this.spriteCuts.dh // Sprite size on Y Scale
     );
 
     if (this.moving) {
@@ -177,7 +176,7 @@ class Sprite {
   updateBullet() {
     this.drawBullet();
     this.position.x += this.velocity.x;
-    this.position.y += this.velocity.y
+    this.position.y += this.velocity.y;
 
     if (this.moving) {
       this.spriteCuts.elapsed++;
@@ -313,7 +312,6 @@ function animate() {
     shootGun();
     fireBullet();
   }
-  
 }
 
 // Draws shooting animation at player position and removes event listeners and set moving to false so player stays in place until finished
@@ -323,13 +321,12 @@ function shootGun() {
     characterShooting.position.y = currentPlayerPosition.y;
     characterShooting.drawCharacterShooting();
     characterShooting.moving = true;
-    
   }
-  if (characterShooting.spriteCuts.elapsed < 75) { // Wait for animation to play before letting the player move
+  if (characterShooting.spriteCuts.elapsed < 75) {
+    // Wait for animation to play before letting the player move
     window.removeEventListener("keydown", keyDownFunction);
     window.removeEventListener("keyup", keyUpFunction);
     characterMoving.moving = false;
-    
   } else {
     window.addEventListener("keydown", keyDownFunction);
     window.addEventListener("keyup", keyUpFunction);
@@ -340,30 +337,30 @@ function shootGun() {
 
 // Draws the bullet and make it fly in the direction of the last key pressed
 function fireBullet() {
-    bullets.forEach((bullet, index) => {
-      bullet.updateBullet(); // Update position and draw for each bullet in the bullets[] array, we use for each so we can access the index value to remove it when it leaves the screen or hits a zombie
+  bullets.forEach((bullet, index) => {
+    bullet.updateBullet(); // Update position and draw for each bullet in the bullets[] array, we use for each so we can access the index value to remove it when it leaves the screen or hits a zombie
 
-      //sets the right sprite animation - currently semi-broken
-      if (lastKey === "a") {
-        bullet.spriteCuts.valy = 3;
-      } else if (lastKey === "w") {
-        bullet.spriteCuts.valy = 0;
-      } else if (lastKey === "s") {
-        bullet.spriteCuts.valy = 1;
-      } else if (lastKey === "d") {
-        bullet.spriteCuts.valy = 2; 
-      }
-    
-      bullet.moving = true;
+    //sets the right sprite animation - currently semi-broken
+    if (lastKey === "a") {
+      bullet.spriteCuts.valy = 3;
+    } else if (lastKey === "w") {
+      bullet.spriteCuts.valy = 0;
+    } else if (lastKey === "s") {
+      bullet.spriteCuts.valy = 1;
+    } else if (lastKey === "d") {
+      bullet.spriteCuts.valy = 2;
+    }
 
-      // Check for collision and off screen and removes the bullet
-      if (bulletIsOffscreen(bullet)) {
-        bullets.splice(index, 1);
-      }
-      if (bulletHitZombie(bullet)) {
-        bullets.splice(index, 1);
-      }
-    });
+    bullet.moving = true;
+
+    // Check for collision and off screen and removes the bullet
+    if (bulletIsOffscreen(bullet)) {
+      bullets.splice(index, 1);
+    }
+    if (bulletHitZombie(bullet)) {
+      bullets.splice(index, 1);
+    }
+  });
 }
 
 // Checks if bullet is going off the map
@@ -372,26 +369,24 @@ function bulletIsOffscreen(bullet) {
     bullet.position.x + bullet.spriteCuts.dw < 0 ||
     bullet.position.x > canvas.width ||
     bullet.position.y + bullet.spriteCuts.dh < 0 ||
-    bullet.position.y > canvas.height 
+    bullet.position.y > canvas.height
   );
 }
 
 // checks if bullet is colliding with the zombie
 function bulletHitZombie(bullet) {
-  return (
-    rectangularCollision({
-      rectangle1: {
-        position: bullet.position,
-        width: bullet.spriteCuts.dw - 30,
-        height: bullet.spriteCuts.dh - 25,
-      },
-      rectangle2: {
-        position: zombieEnemy.position,
-        width: zombieEnemy.spriteCuts.dw - 30,
-        height: zombieEnemy.spriteCuts.dh - 15,
-      },
-    })
-  );
+  return rectangularCollision({
+    rectangle1: {
+      position: bullet.position,
+      width: bullet.spriteCuts.dw - 30,
+      height: bullet.spriteCuts.dh - 25,
+    },
+    rectangle2: {
+      position: zombieEnemy.position,
+      width: zombieEnemy.spriteCuts.dw - 30,
+      height: zombieEnemy.spriteCuts.dh - 15,
+    },
+  });
 }
 
 function drawHealthBar() {
@@ -515,12 +510,12 @@ function keyDownFunction(event) {
       }
       break;
 
-    // Handles data for when enter is pressed for firing animation
+    // Handles data for when enter is pressed for firing animation and creating new bullet sprites
     case "Enter":
       let speed = 2; // Bullet speed
       let velocity;
 
-      // set's velocity to be in the direction character is facing
+      // Set's velocity to be in the direction character is facing
       if (lastKey === "a") {
         characterShooting.spriteCuts.valy = 3;
         velocity = { x: -speed, y: 0 };
@@ -535,24 +530,27 @@ function keyDownFunction(event) {
         velocity = { x: speed, y: 0 };
       }
 
-      // checks if a velocity exists and creates a new bullet sprite to store in the bullets[]
-      if(velocity) {
-      const bulletSprite = new Sprite({
-        position: { x: characterMoving.position.x - 10, y: characterMoving.position.y - 3 },
-        image: bullet,
-        spriteCuts: {
-          sw: bullet.width / 5,
-          sh: bullet.height / 4,
-          dw: bullet.width / 3,
-          dh: bullet.height / 3,
-        },
-        totalFrames: { x: 5, y: 4 },
-        animationSpeed: 25,
-        velocity: velocity
-      });
-      bullets.push(bulletSprite)
-      // keys.enter.pressed = false; // prevent continuous firing - I don't think this matters
-    }
+      // Checks if a velocity exists and creates a new bullet sprite to store in the bullets[]
+      if (velocity) {
+        const bulletSprite = new Sprite({
+          position: {
+            x: characterMoving.position.x - 10,
+            y: characterMoving.position.y - 3,
+          },
+          image: bullet,
+          spriteCuts: {
+            sw: bullet.width / 5,
+            sh: bullet.height / 4,
+            dw: bullet.width / 3,
+            dh: bullet.height / 3,
+          },
+          totalFrames: { x: 5, y: 4 },
+          animationSpeed: 25,
+          velocity: velocity,
+        });
+        bullets.push(bulletSprite);
+        // keys.enter.pressed = false; // prevent continuous firing - I don't think this matters
+      }
 
       currentPlayerPosition.x = characterMoving.position.x; // Saves character position for use such as drawing the shooting animation where the character is
       currentPlayerPosition.y = characterMoving.position.y;
@@ -667,7 +665,7 @@ async function loadAssetsAndStartGame() {
       animationSpeed: 25,
     });
 
-    bullet = bulletImage // saves bulletImage to the global scope bullet variable to be used in creating new bullets
+    bullet = bulletImage; // saves bulletImage to the global scope bullet variable to be used in creating new bullets
 
     animate(); // Start the animation loop
   } catch (error) {
