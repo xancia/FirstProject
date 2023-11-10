@@ -1,6 +1,8 @@
 # FirstProject
 My first project - a game made with HTML, CSS, and JS
 
+Zombie Survivors
+
 Assets used from:
 https://cuddle-bug.itch.io/apocalypse
 https://dagurasusketch.itch.io/retrosounds
