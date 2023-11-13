@@ -22,8 +22,7 @@ https://shatteredreality.itch.io/modern-city
 https://ansimuz.itch.io/cyberpunk-street-environment  
 
 ## To Be Implemented
-
-Player got hit indicator  
+ 
 Zombie got hit indicator  
 Player powerups  
 Music  
