@@ -9,6 +9,7 @@ function loadImage(src) {
   });
 }
 
+// Function to spawn a zombie at set intervals, decreasing with each time until 1s per zombie spawn
 function zombieSpawnInterval() {
   setTimeout(createZombie, 1);
 
