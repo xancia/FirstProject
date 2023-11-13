@@ -25,8 +25,6 @@ https://ansimuz.itch.io/cyberpunk-street-environment
 
 Player got hit indicator  
 Zombie got hit indicator  
-Random Zombie Spawn  
-Difficulty increase  
 Player powerups  
 Music  
 Sfx  
