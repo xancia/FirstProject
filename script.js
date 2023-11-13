@@ -16,7 +16,7 @@ function zombieSpawnInterval() {
   }
 
   clearTimeout(zombieTimeOut); // Clear any existing timeout
-  setTimeout(createZombie, 1);
+  setTimeout(createZombie, 1000);
 
   zombieTimeOut = setTimeout(zombieSpawnInterval, zombieGenerationSpeed);
   if (zombieGenerationSpeed > 1000) {
@@ -170,7 +170,7 @@ function restartGame() {
   killCount.textContent = "Current Kill Count: 0";
   canvas.removeEventListener("click", tryAgain);
   gameOver = false;
-  startAnimation();
+  unpauseGame();
 }
 
 // ----- Global Variables -----
