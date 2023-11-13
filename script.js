@@ -13,6 +13,9 @@ function zombieSpawnInterval() {
   setTimeout(createZombie, 1);
 
   setTimeout(zombieSpawnInterval, zombieGenerationSpeed);
+  if (zombieGenerationSpeed > 1000) {
+  zombieGenerationSpeed -= 50
+  }
 }
 
 // A function to check for rectangular collisions between 2 objects
@@ -177,7 +180,7 @@ let lastHealthDropTime = Date.now();
 let zombiesKilled = 0;
 let currentHighScore = 0;
 let gameOver = false;
-let zombieGenerationSpeed = getRandomNumber(2000, 4000);
+let zombieGenerationSpeed = 5000;
 let zombieDeathPosition = {};
 let zombieWasKilled = false;
 
