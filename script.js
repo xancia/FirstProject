@@ -20,7 +20,7 @@ function zombieSpawnInterval() {
 
   zombieTimeOut = setTimeout(zombieSpawnInterval, zombieGenerationSpeed);
   if (zombieGenerationSpeed > 1000) {
-    zombieGenerationSpeed -= 50;
+    zombieGenerationSpeed -= 25;
   }
 }
 
