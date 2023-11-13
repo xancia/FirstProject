@@ -163,6 +163,7 @@ function restartGame() {
   zombies = [];
   bullets = [];
   playerHealth = 100;
+  zombieGenerationSpeed = 5000;
   zombiesKilled = 0;
   currentPlayerPosition = { x: 0, y: 0 };
   characterMoving.position.x = canvas.width / 2;
