@@ -15,7 +15,7 @@ function zombieSpawnInterval() {
 
   setTimeout(zombieSpawnInterval, zombieGenerationSpeed);
   if (zombieGenerationSpeed > 1000) {
-  zombieGenerationSpeed -= 50
+    zombieGenerationSpeed -= 50;
   }
 }
 
@@ -216,6 +216,7 @@ class Sprite {
     totalFrames,
     animationSpeed = 25,
     velocity,
+    opacity = 1,
   }) {
     this.position = position;
     this.image = image;
@@ -229,6 +230,7 @@ class Sprite {
     };
     this.moving = false;
     this.velocity = velocity;
+    this.opacity = opacity;
   }
 
   drawBackground() {
@@ -236,6 +238,8 @@ class Sprite {
   }
 
   drawCharacter() {
+    ctx.save(); // Saves current state - Good practice for making sure the hiteffect opacity won't mess with anything else
+    ctx.globalAlpha = this.opacity; // This is required to change the opacity of the drawn image
     ctx.drawImage(
       this.image,
       this.spriteCuts.val * 32, // X position for sprite sheet
@@ -259,6 +263,7 @@ class Sprite {
       this.spriteCuts.val = 1; // Reset to the first frame or an idle frame
       this.spriteCuts.elapsed = 0; // Reset counter
     }
+    ctx.restore(); // Restores the save state
   }
 
   drawCharacterShooting() {
@@ -585,6 +590,7 @@ function updateHealth(zombie) {
     // Check if it's been at least 1 second since the last health drop
     if (now - lastHealthDropTime >= 1000) {
       playerHealth -= 10; // Decrease health by 10
+      showHitEffect();
       lastHealthDropTime = now; // Update the last health drop time
     }
   }
@@ -787,6 +793,24 @@ function keyUpFunction(event) {
   ) {
     characterMoving.moving = false;
   }
+}
+
+// Function to flash the character when hit
+function showHitEffect() {
+  const originalOpacity = characterMoving.opacity; // Assuming there's an opacity property
+  let hitEffectDuration = 500; // Duration of the hit effect
+  let flashInterval = 100; // Interval for flashing
+  let elapsed = 0;
+
+  const flashEffect = setInterval(() => {
+    characterMoving.opacity = characterMoving.opacity === 1 ? 0 : 1; // Toggle opacity with single line if else, === 1 checks if it's current 1, if true change to 0, if false change to 1
+    elapsed += flashInterval;
+
+    if (elapsed >= hitEffectDuration) {
+      clearInterval(flashEffect);
+      characterMoving.opacity = originalOpacity; // Reset to original opacity
+    }
+  }, flashInterval);
 }
 
 // ----- Event Listeners -----
