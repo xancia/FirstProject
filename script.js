@@ -159,15 +159,12 @@ let characterMoving,
   bulletDirection,
   bullet,
   bulletFacingDirection,
-  zombieImage;
+  zombieImage,
+  zombieDeath;
 let playerHealth = 100;
 let currentPlayerPosition = { x: 0, y: 0 };
 let bullets = [];
 let zombies = [];
-let bulletLeft = 0;
-let bulletRight = 0;
-let bulletUp = 0;
-let bulletDown = 0;
 let isPlayerShooting = false;
 const maxPlayerHealth = 100;
 let lastHealthDropTime = Date.now();
@@ -175,6 +172,8 @@ let zombiesKilled = 0;
 let currentHighScore = 0;
 let gameOver = false;
 let zombieGenerationSpeed = 3000;
+let zombieDeathPosition = {};
+let zombieWasKilled = false;
 
 // These constants are for the try again button
 const buttonWidth = 150;
@@ -411,6 +410,10 @@ function animate() {
     }
   }
 
+  if (zombieDeath && zombieWasKilled) {
+    zombieDeathAnimation();
+  }
+
   drawHealthBar();
 
   boundaries.forEach((boundary) => boundary.draw());
@@ -614,9 +617,22 @@ function updateZombieHealth(zombie, bullet, index) {
 
   // If health is 0, handle the zombie death (killCount, despawn, etc.)
   if (zombie.health <= 0) {
+    zombieDeathPosition = zombie.position;
+    zombieWasKilled = true;
     zombies.splice(index, 1);
     zombiesKilled++;
     killCount.textContent = `Current Kill Count: ${zombiesKilled}`;
+  }
+}
+
+function zombieDeathAnimation() {
+  zombieDeath.position.x = zombieDeathPosition.x;
+  zombieDeath.position.y = zombieDeathPosition.y;
+  zombieDeath.drawCharacter();
+  zombieDeath.moving = true;
+  if (zombieDeath.spriteCuts.val == 6) {
+    zombieWasKilled = false;
+    zombieDeath.spriteCuts.val = 0;
   }
 }
 
@@ -771,14 +787,21 @@ window.addEventListener("keyup", keyUpFunction);
 // ----- Asset Loading and Game Initialization -----
 async function loadAssetsAndStartGame() {
   try {
-    const [newMap, playerWalk, zombieWalk, playerShoot, bulletImage] =
-      await Promise.all([
-        loadImage("./assets/Tile Set/newMap.png"),
-        loadImage("./assets/Apocalypse Character Pack/Player/Walk.png"),
-        loadImage("./assets/Apocalypse Character Pack/Zombie/Walk.png"),
-        loadImage("./assets/Apocalypse Character Pack/Player/Shoot.png"),
-        loadImage("./assets/Apocalypse Character Pack/Player/Bullet.png"),
-      ]);
+    const [
+      newMap,
+      playerWalk,
+      zombieWalk,
+      playerShoot,
+      bulletImage,
+      zombieDeathImage,
+    ] = await Promise.all([
+      loadImage("./assets/Tile Set/newMap.png"),
+      loadImage("./assets/Apocalypse Character Pack/Player/Walk.png"),
+      loadImage("./assets/Apocalypse Character Pack/Zombie/Walk.png"),
+      loadImage("./assets/Apocalypse Character Pack/Player/Shoot.png"),
+      loadImage("./assets/Apocalypse Character Pack/Player/Bullet.png"),
+      loadImage("assets/Apocalypse Character Pack/Zombie/Death.png"),
+    ]);
 
     background = new Sprite({
       position: { x: 0, y: 0 },
@@ -814,6 +837,19 @@ async function loadAssetsAndStartGame() {
         dh: playerShoot.height / 4,
       },
       totalFrames: { x: 5, y: 4 },
+      animationSpeed: 25,
+    });
+
+    zombieDeath = new Sprite({
+      position: { x: 0, y: 0 },
+      image: zombieDeathImage,
+      spriteCuts: {
+        sw: zombieDeathImage.width / 8,
+        sh: zombieDeathImage.height / 4,
+        dw: zombieDeathImage.width / 8,
+        dh: zombieDeathImage.height / 4,
+      },
+      totalFrames: { x: 8, y: 4 },
       animationSpeed: 25,
     });
 
