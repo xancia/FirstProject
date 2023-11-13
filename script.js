@@ -9,6 +9,12 @@ function loadImage(src) {
   });
 }
 
+function zombieSpawnInterval() {
+  setTimeout(createZombie, 1);
+
+  setTimeout(zombieSpawnInterval, zombieGenerationSpeed);
+}
+
 // A function to check for rectangular collisions between 2 objects
 function rectangularCollision({ rectangle1, rectangle2 }) {
   return (
@@ -171,7 +177,7 @@ let lastHealthDropTime = Date.now();
 let zombiesKilled = 0;
 let currentHighScore = 0;
 let gameOver = false;
-let zombieGenerationSpeed = 3000;
+let zombieGenerationSpeed = getRandomNumber(2000, 4000);
 let zombieDeathPosition = {};
 let zombieWasKilled = false;
 
@@ -864,4 +870,4 @@ async function loadAssetsAndStartGame() {
 
 loadAssetsAndStartGame(); // Call the function to load assets and start the game
 
-setInterval(createZombie, zombieGenerationSpeed); // using set interval to create a zombie every x * 1000 seconds
+zombieSpawnInterval(); // Randomized spawn times controlled by ZombieGenerationSpeed
