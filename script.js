@@ -11,12 +11,41 @@ function loadImage(src) {
 
 // Function to spawn a zombie at set intervals, decreasing with each time until 1s per zombie spawn
 function zombieSpawnInterval() {
+  if (isGamePaused) {
+    return;
+  }
+
+  clearTimeout(zombieTimeOut); // Clear any existing timeout
   setTimeout(createZombie, 1);
 
-  setTimeout(zombieSpawnInterval, zombieGenerationSpeed);
+  zombieTimeOut = setTimeout(zombieSpawnInterval, zombieGenerationSpeed);
   if (zombieGenerationSpeed > 1000) {
     zombieGenerationSpeed -= 50;
   }
+}
+
+function startAnimation() {
+  if (!animationFrameId) {
+    // Prevent multiple loops from starting
+    animate(); // Start the animation loop
+  }
+}
+
+function stopAnimation() {
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId); // Stop the animation loop
+    animationFrameId = null; // Reset the loop check
+  }
+
+  clearTimeout(zombieTimeOut);
+  isGamePaused = true;
+}
+
+// Function to unpause the game
+function unpauseGame() {
+  isGamePaused = false;
+  startAnimation();
+  zombieSpawnInterval();
 }
 
 // A function to check for rectangular collisions between 2 objects
@@ -170,7 +199,8 @@ let characterMoving,
   bullet,
   bulletFacingDirection,
   zombieImage,
-  zombieDeath;
+  zombieDeath,
+  zombieTimeOut;
 let playerHealth = 100;
 let currentPlayerPosition = { x: 0, y: 0 };
 let bullets = [];
@@ -184,6 +214,7 @@ let gameOver = false;
 let zombieGenerationSpeed = 5000;
 let zombieDeathPosition = {};
 let zombieWasKilled = false;
+let isGamePaused = false;
 
 // These constants are for the try again button
 const buttonWidth = 150;
@@ -652,21 +683,6 @@ function zombieDeathAnimation() {
   }
 }
 
-function startAnimation() {
-  if (!animationFrameId) {
-    // Prevent multiple loops from starting
-    animate(); // Start the animation loop
-  }
-}
-
-function stopAnimation() {
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId); // Stop the animation loop
-    clearInterval(createZombie);
-    animationFrameId = null; // Reset the loop check
-  }
-}
-
 function keyDownFunction(event) {
   // Handle key down logic and choosing the right sprite animation based on direction
   switch (event.key) {
@@ -703,7 +719,7 @@ function keyDownFunction(event) {
       if (animationFrameId) {
         stopAnimation();
       } else {
-        startAnimation();
+        unpauseGame();
       }
       break;
 

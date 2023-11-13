@@ -32,7 +32,6 @@ New Weapons
 ## Known Bugs
 
 Bullet Projectile Animation Improperly changing direction after being fired  
-Pausing the game doesn't pause zombie spawn
 
 ## License
 © [Cuong Ma]()
