@@ -151,14 +151,19 @@ function drawPlayButton() {
 
   // Draw Play button
   ctx.fillStyle = "#000";
-  ctx.fillRect(canvas.width / 2 - buttonWidth / 2, canvas.height / 2 - 20, buttonWidth, buttonHeight);
+  ctx.fillRect(
+    canvas.width / 2 - buttonWidth / 2,
+    canvas.height / 2 - 20,
+    buttonWidth,
+    buttonHeight
+  );
 
   // Draw Play button text
   ctx.fillStyle = "#FFF";
   ctx.font = "15px Arial";
   ctx.fillText("Play Game", canvas.width / 2 - 35, canvas.height / 2 + 10);
 
-  canvas,addEventListener("click", playGame)
+  canvas, addEventListener("click", playGame);
 }
 
 function playGame(event) {
@@ -173,7 +178,7 @@ function playGame(event) {
   ) {
     loadAssetsAndStartGame();
     zombieSpawnInterval();
-    bgmMusic.play()
+    bgmMusic.play();
   }
 }
 
@@ -252,7 +257,6 @@ let zombieGenerationSpeed = 5000;
 let zombieDeathPosition = {};
 let zombieWasKilled = false;
 let isGamePaused = false;
-
 
 // These constants are for the try again button
 const buttonWidth = 150;
@@ -534,7 +538,7 @@ function shootGun() {
     characterShooting.position.y = currentPlayerPosition.y;
     characterShooting.drawCharacterShooting();
     characterShooting.moving = true;
-    attackAudio.play()
+    attackAudio.play();
   }
   if (characterShooting.spriteCuts.elapsed < 75) {
     // Wait for animation to play before letting the player move
@@ -660,7 +664,7 @@ function updateHealth(zombie) {
     // Check if it's been at least 1 second since the last health drop
     if (now - lastHealthDropTime >= 1000) {
       playerHealth -= 10; // Decrease health by 10
-      playerDamageSound.play()
+      playerDamageSound.play();
       showHitEffect();
       lastHealthDropTime = now; // Update the last health drop time
     }
@@ -707,7 +711,7 @@ function updateZombieHealth(zombie, bullet, index) {
     zombieDeathPosition = zombie.position;
     zombieWasKilled = true;
     zombies.splice(index, 1);
-    zombieDeathSound.play()
+    zombieDeathSound.play();
     zombiesKilled++;
     killCount.textContent = `Current Kill Count: ${zombiesKilled}`;
   }
@@ -854,7 +858,7 @@ function keyUpFunction(event) {
 
 // Function to flash the character when hit
 function showHitEffect() {
-  const originalOpacity = characterMoving.opacity; // Assuming there's an opacity property
+  const originalOpacity = characterMoving.opacity;
   let hitEffectDuration = 500; // Duration of the hit effect
   let flashInterval = 100; // Interval for flashing
   let elapsed = 0;
@@ -953,5 +957,4 @@ async function loadAssetsAndStartGame() {
   }
 }
 
-drawPlayButton() // Calls loadAssetsAndStartGame() & zombieSpawnInterval()
-
+drawPlayButton(); // Calls loadAssetsAndStartGame() & zombieSpawnInterval()
