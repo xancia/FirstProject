@@ -129,7 +129,7 @@ function drawGameOverScreen() {
   ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 50);
 
   // Draw try again button
-  ctx.fillStyle = "#000";
+  ctx.fillStyle = "#202020";
   ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
 
   // Draw try again button text
@@ -150,7 +150,7 @@ function drawPlayButton() {
   ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
 
   // Draw Play button
-  ctx.fillStyle = "#000";
+  ctx.fillStyle = "#202020";
   ctx.fillRect(
     canvas.width / 2 - buttonWidth / 2,
     canvas.height / 2 - 20,
