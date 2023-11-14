@@ -5,7 +5,7 @@ My first project, a game created with HTML, CSS, and Javascript using the Canvas
 Although this was my first project assigned by my Instructor at the Per Scholas Software Engineering Course, I wanted to shoot high and make something I can be proud of, plus I really like vampire survivors.
 
 ## Features
-Animated Sprites for walking and shooting, somewhat optimized collision detection.
+Animated Sprites for walking and shooting, zombie death animation, somewhat optimized collision detection, bgm, sfx.
 
 ## How to use?
 Open in GitHub Page to play.
