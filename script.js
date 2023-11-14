@@ -173,6 +173,7 @@ function playGame(event) {
   ) {
     loadAssetsAndStartGame();
     zombieSpawnInterval();
+    bgmMusic.play()
   }
 }
 
@@ -659,6 +660,7 @@ function updateHealth(zombie) {
     // Check if it's been at least 1 second since the last health drop
     if (now - lastHealthDropTime >= 1000) {
       playerHealth -= 10; // Decrease health by 10
+      playerDamageSound.play()
       showHitEffect();
       lastHealthDropTime = now; // Update the last health drop time
     }

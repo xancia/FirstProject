@@ -20,19 +20,19 @@ https://dagurasusketch.itch.io/retrosounds
 https://timbeek.itch.io/free-retro-boss-music  
 https://shatteredreality.itch.io/modern-city  
 https://ansimuz.itch.io/cyberpunk-street-environment  
+Getting hit hugh by dersuperanton freesound.org
 Minecraft Zombie Death Sound  
 
 ## To Be Implemented
  
 Zombie got hit indicator  
-Player powerups  
-Music  
-Sfx  
+Player powerups   
 New Weapons  
 
 ## Known Bugs
 
 Bullet Projectile Animation Improperly changing direction after being fired  
+Sometimes when the game loads, the animations are at an improper speed  
 
 ## License
 © [Cuong Ma]()
