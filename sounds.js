@@ -9,5 +9,5 @@ const playerDamageSound = new Audio("./assets/sfx/434462__dersuperanton__getting
 playerDamageSound.volume = 0.15;
 
 const bgmMusic = document.getElementById("bgm-music")
-bgmMusic.volume = 0.15;
+bgmMusic.volume = 0.2;
 bgmMusic.loop = true;
