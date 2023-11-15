@@ -33,7 +33,7 @@ New Weapons
 ## Known Bugs
 
 Bullet Projectile Animation Improperly changing direction after being fired  
-Sometimes when the game loads, the animations are at an improper speed  
+Sometimes when the game loads, the animations are at an improper speed, I suspect it's an asset loading problem again  
 
 ## License
 © [Cuong Ma]()
