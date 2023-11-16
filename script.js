@@ -68,6 +68,27 @@ function checkCollision(nextPos) {
   );
 }
 
+// Function checks to see if player is touching a fruit, splices that fruit after picked up and activate powerup
+function checkFruit() {
+  fruitArr.forEach((fruit, index) => {
+    if (rectangularCollision({
+      rectangle1: {
+        position: fruit.position,
+        width: fruit.spriteCuts.dw,
+        height: fruit.spriteCuts.dh,
+      },
+      rectangle2: {
+        position: characterMoving.position,
+        width: characterMoving.spriteCuts.dw - 20,
+        height: characterMoving.spriteCuts.dh - 10,
+      },
+    })) {
+      fruitArr.splice(index, 1)
+      powerUp()
+    }
+  }) 
+}
+
 // Utility to get random number
 function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -242,11 +263,13 @@ let characterMoving,
   bulletFacingDirection,
   zombieImage,
   zombieDeath,
-  zombieTimeOut;
+  zombieTimeOut,
+  fruits;
 let playerHealth = 100;
 let currentPlayerPosition = { x: 0, y: 0 };
 let bullets = [];
 let zombies = [];
+let fruitArr = [];
 let isPlayerShooting = false;
 const maxPlayerHealth = 100;
 let lastHealthDropTime = Date.now();
@@ -257,6 +280,8 @@ let zombieGenerationSpeed = 5000;
 let zombieDeathPosition = {};
 let zombieWasKilled = false;
 let isGamePaused = false;
+let playerSpeed = 1;
+let playerDamageBoost = 0;
 
 // These constants are for the try again button
 const buttonWidth = 150;
@@ -278,6 +303,38 @@ class Boundary {
   draw() {
     ctx.fillStyle = "rgba(255, 255, 255, 0)";
     ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+  }
+}
+
+class Fruit {
+  constructor({
+    position,
+    image,
+    spriteCuts,
+    totalFrames,
+  }) {
+    this.position = position;
+    this.image = image;
+    this.spriteCuts = {
+      ...spriteCuts,
+      val: 0,
+      valy: 0,
+      totalFrames,
+    };
+  }
+
+  drawFruit() {
+    ctx.drawImage(
+      this.image,
+      this.spriteCuts.val * 16, // X position for sprite sheet
+      this.spriteCuts.valy * 16, // Y position for sprite sheet
+      this.image.width / this.spriteCuts.totalFrames.x, // Single frame width
+      this.image.height / this.spriteCuts.totalFrames.y, // Single frame height
+      this.position.x, // Starting X position
+      this.position.y, // Starting Y Position
+      this.spriteCuts.dw, // Sprite size on X Scale
+      this.spriteCuts.dh // Sprite size on Y Scale
+    )
   }
 }
 
@@ -508,16 +565,16 @@ function animate() {
 
   // Handle player movement based on key presses
   if (keys.a.pressed && lastKey === "a" && characterMoving.moving) {
-    movePlayer(-1, 0);
+    movePlayer(-1 * playerSpeed, 0);
   }
   if (keys.d.pressed && lastKey === "d" && characterMoving.moving) {
-    movePlayer(1, 0);
+    movePlayer(1 * playerSpeed, 0);
   }
   if (keys.w.pressed && lastKey === "w" && characterMoving.moving) {
-    movePlayer(0, -1);
+    movePlayer(0, -1 * playerSpeed);
   }
   if (keys.s.pressed && lastKey === "s" && characterMoving.moving) {
-    movePlayer(0, 1);
+    movePlayer(0, 1 * playerSpeed);
   }
 
   // Shoot projectile in the faced direction when enter is pressed
@@ -529,6 +586,14 @@ function animate() {
   if (gameOver) {
     drawGameOverScreen();
   }
+
+  // Draws the fruit in the fruitarray
+  for (let fruit of fruitArr) {
+    fruit.drawFruit()
+  }
+
+  //Checks to see if player has picked up a fruit
+  checkFruit()
 }
 
 // Draws shooting animation at player position and removes event listeners and set moving to false so player stays in place until finished
@@ -703,7 +768,7 @@ function updateZombieHealth(zombie, bullet, index) {
       },
     })
   ) {
-    zombie.health -= 20; // Determines how much damage the zombie takes
+    zombie.health -= 20 + playerDamageBoost; // Determines how much damage the zombie takes
   }
 
   // If health is 0, handle the zombie death (killCount, despawn, etc.)
@@ -714,6 +779,10 @@ function updateZombieHealth(zombie, bullet, index) {
     zombieDeathSound.play();
     zombiesKilled++;
     killCount.textContent = `Current Kill Count: ${zombiesKilled}`;
+    if (getRandomNumber(1,10) > 7) {
+    createFruit(zombieDeathPosition)
+    }
+    console.log(fruitArr)
   }
 }
 
@@ -874,6 +943,42 @@ function showHitEffect() {
   }, flashInterval);
 }
 
+// This creates a new fruit and stores it inside of the fruitarr[]
+function createFruit(input) {
+  if (fruits) {
+    let newFruit = new Fruit({
+      position: { x: 0, y: 0 },
+      image: fruits,
+      spriteCuts: {
+        sw: fruits.width / 5,
+        sh: fruits.height / 3,
+        dw: fruits.width / 5,
+        dh: fruits.height / 3,
+      },
+      totalFrames: { x: 5, y: 3 },
+    });
+
+    newFruit.position.x = input.x
+    newFruit.position.y = input.y
+    newFruit.spriteCuts.val = getRandomNumber(0,4)
+    newFruit.spriteCuts.valy = getRandomNumber(0,1)
+    fruitArr.push(newFruit)
+  }
+}
+
+// Increases player movement speed and damage
+function powerUp() {
+  playerSpeed = 1.5;
+  playerDamageBoost = 20;
+
+  setTimeout(resetPlayerPower, 10000) // Duration of power up
+}
+
+function resetPlayerPower() {
+  playerSpeed = 1;
+  playerDamageBoost = 0;
+}
+
 // ----- Event Listeners -----
 window.addEventListener("keydown", keyDownFunction);
 
@@ -889,13 +994,15 @@ async function loadAssetsAndStartGame() {
       playerShoot,
       bulletImage,
       zombieDeathImage,
+      fruitImage,
     ] = await Promise.all([
       loadImage("./assets/Tile Set/newMap.png"),
       loadImage("./assets/Apocalypse Character Pack/Player/Walk.png"),
       loadImage("./assets/Apocalypse Character Pack/Zombie/Walk.png"),
       loadImage("./assets/Apocalypse Character Pack/Player/Shoot.png"),
       loadImage("./assets/Apocalypse Character Pack/Player/Bullet.png"),
-      loadImage("assets/Apocalypse Character Pack/Zombie/Death.png"),
+      loadImage("./assets/Apocalypse Character Pack/Zombie/Death.png"),
+      loadImage("./assets/Fruit Assets/Full Sheet.png"),
     ]);
 
     background = new Sprite({
@@ -948,6 +1055,7 @@ async function loadAssetsAndStartGame() {
       animationSpeed: 25,
     });
 
+    fruits = fruitImage;
     zombieImage = zombieWalk;
     bullet = bulletImage; // saves bulletImage to the global scope bullet variable to be used in creating new bullets
 
@@ -958,3 +1066,4 @@ async function loadAssetsAndStartGame() {
 }
 
 drawPlayButton(); // Calls loadAssetsAndStartGame() & zombieSpawnInterval()
+
