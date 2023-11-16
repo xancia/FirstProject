@@ -8,7 +8,8 @@ Although this was my first project assigned by my Instructor at the Per Scholas 
 Animated Sprites for walking and shooting, zombie death animation, somewhat optimized collision detection, bgm, sfx, zombies can drop power up fruits.
 
 ## How to use?
-Open in GitHub Page to play.
+Open in GitHub Page to play.  
+https://xancia.github.io/FirstProject/  
 
 ## Credits
 Biggest Inspiration: Vampire Survivors
