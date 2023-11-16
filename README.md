@@ -22,6 +22,8 @@ https://shatteredreality.itch.io/modern-city
 https://ansimuz.itch.io/cyberpunk-street-environment  
 https://dantepixels.itch.io/small-fruits-asset-16x16  
 Getting hit hugh by dersuperanton freesound.org  
+https://freesound.org/people/MATRIXXX_/sounds/523654/  
+https://freesound.org/people/colorsCrimsonTears/sounds/577960/  
 Minecraft Zombie Death Sound  
 Vampire Survivors OST - Before Confession  
 

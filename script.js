@@ -970,13 +970,14 @@ function createFruit(input) {
 function powerUp() {
   playerSpeed = 1.5;
   playerDamageBoost = 20;
-
+  playerPowerUp.play()
   setTimeout(resetPlayerPower, 10000) // Duration of power up
 }
 
 function resetPlayerPower() {
   playerSpeed = 1;
   playerDamageBoost = 0;
+  playerPowerDown.play()
 }
 
 // ----- Event Listeners -----

@@ -11,3 +11,9 @@ playerDamageSound.volume = 0.15;
 const bgmMusic = document.getElementById("bgm-music")
 bgmMusic.volume = 0.2;
 bgmMusic.loop = true;
+
+const playerPowerUp = new Audio("./assets/sfx/523654__matrixxx__powerup-10.wav")
+playerPowerUp.volume = 0.15;
+
+const playerPowerDown = new Audio("./assets/sfx/577960__colorscrimsontears__power-down-rpg.wav")
+playerPowerDown.volume = 0.25;
