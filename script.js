@@ -783,7 +783,6 @@ function updateZombieHealth(zombie, bullet, index) {
     if (getRandomNumber(1,10) > 7) {
     createFruit(zombieDeathPosition)
     }
-    console.log(fruitArr)
   }
 }
 
