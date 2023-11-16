@@ -264,7 +264,8 @@ let characterMoving,
   zombieImage,
   zombieDeath,
   zombieTimeOut,
-  fruits;
+  fruits,
+  powerDownTimeout;
 let playerHealth = 100;
 let currentPlayerPosition = { x: 0, y: 0 };
 let bullets = [];
@@ -971,13 +972,19 @@ function powerUp() {
   playerSpeed = 1.5;
   playerDamageBoost = 20;
   playerPowerUp.play()
-  setTimeout(resetPlayerPower, 10000) // Duration of power up
+
+  // If player already has powerup, clear the timeout
+  if(powerDownTimeout) {
+    clearTimeout(powerDownTimeout)
+  }
+  powerDownTimeout = setTimeout(resetPlayerPower, 10000) // Duration of power up
 }
 
 function resetPlayerPower() {
   playerSpeed = 1;
   playerDamageBoost = 0;
   playerPowerDown.play()
+  powerDownTimeout = null; // Clear the timeout variable
 }
 
 // ----- Event Listeners -----

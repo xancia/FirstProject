@@ -36,7 +36,6 @@ New Weapons
 
 Bullet Projectile Animation Improperly changing direction after being fired  
 Sometimes when the game loads, the animations are at an improper speed, I suspect it's an asset loading problem again  
-fruit power ups don't extend power up when picking up a fruit during power up duration  
 
 ## License
 © [Cuong Ma]()
