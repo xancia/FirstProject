@@ -5,11 +5,16 @@ My first project, a game created with HTML, CSS, and Javascript using the Canvas
 Although this was my first project assigned by my Instructor at the Per Scholas Software Engineering Course, I wanted to shoot high and make something I can be proud of, plus I really like vampire survivors.
 
 ## Features
-Animated Sprites for walking and shooting, zombie death animation, somewhat optimized collision detection, bgm, sfx, zombies can drop power up fruits.
+Animated Sprites for walking and shooting, zombie death animation, collision detection, bgm, sfx, zombies can drop power up fruits that increase player movement speed and damage for 10s.
 
-## How to use?
-Open in GitHub Page to play.  
+## How to play?
+Open in GitHub Page to play. Try to get a high score!  
 https://xancia.github.io/FirstProject/  
+
+## Controls
+WASD to Move  
+ENTER to Shoot in faced direction  
+ESC to pause the game  
 
 ## Credits
 Biggest Inspiration: Vampire Survivors
