@@ -16,7 +16,7 @@ function zombieSpawnInterval() {
   }
 
   clearTimeout(zombieTimeOut); // Clear any existing timeout
-  setTimeout(createZombie, 1000);
+  setTimeout(createZombie, 1000); // This is to handle the asset loading problem
 
   zombieTimeOut = setTimeout(zombieSpawnInterval, zombieGenerationSpeed);
   if (zombieGenerationSpeed > 1000) {
@@ -71,22 +71,24 @@ function checkCollision(nextPos) {
 // Function checks to see if player is touching a fruit, splices that fruit after picked up and activate powerup
 function checkFruit() {
   fruitArr.forEach((fruit, index) => {
-    if (rectangularCollision({
-      rectangle1: {
-        position: fruit.position,
-        width: fruit.spriteCuts.dw,
-        height: fruit.spriteCuts.dh,
-      },
-      rectangle2: {
-        position: characterMoving.position,
-        width: characterMoving.spriteCuts.dw - 20,
-        height: characterMoving.spriteCuts.dh - 10,
-      },
-    })) {
-      fruitArr.splice(index, 1)
-      powerUp()
+    if (
+      rectangularCollision({
+        rectangle1: {
+          position: fruit.position,
+          width: fruit.spriteCuts.dw,
+          height: fruit.spriteCuts.dh,
+        },
+        rectangle2: {
+          position: characterMoving.position,
+          width: characterMoving.spriteCuts.dw - 20,
+          height: characterMoving.spriteCuts.dh - 10,
+        },
+      })
+    ) {
+      fruitArr.splice(index, 1);
+      powerUp();
     }
-  }) 
+  });
 }
 
 // Utility to get random number
@@ -309,12 +311,7 @@ class Boundary {
 }
 
 class Fruit {
-  constructor({
-    position,
-    image,
-    spriteCuts,
-    totalFrames,
-  }) {
+  constructor({ position, image, spriteCuts, totalFrames }) {
     this.position = position;
     this.image = image;
     this.spriteCuts = {
@@ -336,7 +333,7 @@ class Fruit {
       this.position.y, // Starting Y Position
       this.spriteCuts.dw, // Sprite size on X Scale
       this.spriteCuts.dh // Sprite size on Y Scale
-    )
+    );
   }
 }
 
@@ -591,11 +588,11 @@ function animate() {
 
   // Draws the fruit in the fruitarray
   for (let fruit of fruitArr) {
-    fruit.drawFruit()
+    fruit.drawFruit();
   }
 
   //Checks to see if player has picked up a fruit
-  checkFruit()
+  checkFruit();
 }
 
 // Draws shooting animation at player position and removes event listeners and set moving to false so player stays in place until finished
@@ -781,8 +778,8 @@ function updateZombieHealth(zombie, bullet, index) {
     zombieDeathSound.play();
     zombiesKilled++;
     killCount.textContent = `Current Kill Count: ${zombiesKilled}`;
-    if (getRandomNumber(1,10) > 7) {
-    createFruit(zombieDeathPosition)
+    if (getRandomNumber(1, 10) > 7) {
+      createFruit(zombieDeathPosition);
     }
   }
 }
@@ -910,10 +907,6 @@ function keyUpFunction(event) {
     case "Escape":
       keys.escape.pressed = false;
       break;
-
-    // case "Enter":
-    //   bulletFired = false;
-    //   break;
   }
   // If none of the movement keys are pressed, set moving to false
   if (
@@ -959,11 +952,11 @@ function createFruit(input) {
       totalFrames: { x: 5, y: 3 },
     });
 
-    newFruit.position.x = input.x
-    newFruit.position.y = input.y
-    newFruit.spriteCuts.val = getRandomNumber(0,4)
-    newFruit.spriteCuts.valy = getRandomNumber(0,1)
-    fruitArr.push(newFruit)
+    newFruit.position.x = input.x;
+    newFruit.position.y = input.y;
+    newFruit.spriteCuts.val = getRandomNumber(0, 4);
+    newFruit.spriteCuts.valy = getRandomNumber(0, 1);
+    fruitArr.push(newFruit);
   }
 }
 
@@ -971,19 +964,19 @@ function createFruit(input) {
 function powerUp() {
   playerSpeed = 1.5;
   playerDamageBoost = 20;
-  playerPowerUp.play()
+  playerPowerUp.play();
 
   // If player already has powerup, clear the timeout
-  if(powerDownTimeout) {
-    clearTimeout(powerDownTimeout)
+  if (powerDownTimeout) {
+    clearTimeout(powerDownTimeout);
   }
-  powerDownTimeout = setTimeout(resetPlayerPower, 10000) // Duration of power up
+  powerDownTimeout = setTimeout(resetPlayerPower, 10000); // Duration of power up
 }
 
 function resetPlayerPower() {
   playerSpeed = 1;
   playerDamageBoost = 0;
-  playerPowerDown.play()
+  playerPowerDown.play();
   powerDownTimeout = null; // Clear the timeout variable
 }
 
@@ -1074,4 +1067,3 @@ async function loadAssetsAndStartGame() {
 }
 
 drawPlayButton(); // Calls loadAssetsAndStartGame() & zombieSpawnInterval()
-
