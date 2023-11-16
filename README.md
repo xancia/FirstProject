@@ -20,6 +20,7 @@ https://dagurasusketch.itch.io/retrosounds
 https://timbeek.itch.io/free-retro-boss-music  
 https://shatteredreality.itch.io/modern-city  
 https://ansimuz.itch.io/cyberpunk-street-environment  
+https://dantepixels.itch.io/small-fruits-asset-16x16  
 Getting hit hugh by dersuperanton freesound.org  
 Minecraft Zombie Death Sound  
 Vampire Survivors OST - Before Confession  
