@@ -200,6 +200,7 @@ function playGame(event) {
     loadAssetsAndStartGame();
     zombieSpawnInterval();
     bgmMusic.play();
+    canvas, removeEventListener("click", playGame);
   }
 }
 
