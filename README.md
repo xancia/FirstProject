@@ -37,6 +37,7 @@ Vampire Survivors OST - Before Confession
  
 Zombie got hit indicator   
 New Weapons  
+Zombie Drop EXP/Level Up Systems  
 
 ## Known Bugs
 
